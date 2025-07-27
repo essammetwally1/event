@@ -1,3 +1,5 @@
+import 'package:event/app_theme.dart';
+import 'package:event/home_screen.dart';
 import 'package:flutter/material.dart';
 
 // WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -17,16 +19,9 @@ class EventApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: HomeScreen.routeName,
       routes: {HomeScreen.routeName: (context) => HomeScreen()},
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.dartTheme,
+      themeMode: ThemeMode.light,
     );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  static const String routeName = '/home';
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold();
   }
 }
