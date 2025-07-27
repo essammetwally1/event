@@ -4,10 +4,12 @@ class AppTheme {
   static const Color primary = Color(0xFF5669FF);
   static const Color gray = Color(0xFF7B7B7B);
   static const Color backgroundWhite = Color(0xFFF2FEFF);
+  static const Color backgroundDark = Color(0xFF101127);
   static const Color black = Color(0xFF1C1C1C);
   static const Color red = Color(0xFFFF5659);
 
   static ThemeData lightTheme = ThemeData(
+    appBarTheme: AppBarTheme(backgroundColor: backgroundWhite),
     scaffoldBackgroundColor: backgroundWhite,
     splashColor: Colors.transparent,
     highlightColor: Colors.transparent,
@@ -25,6 +27,8 @@ class AppTheme {
     ),
     bottomAppBarTheme: BottomAppBarTheme(color: primary, elevation: 0),
     inputDecorationTheme: InputDecorationTheme(
+      contentPadding: EdgeInsets.all(18),
+
       hintStyle: TextStyle(
         fontSize: 16,
         color: gray,
@@ -45,6 +49,35 @@ class AppTheme {
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide(color: red),
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: primary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+    ),
+    textTheme: TextTheme(
+      titleLarge: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w500,
+        color: backgroundWhite,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: primary,
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: primary,
+        textStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          fontStyle: FontStyle.italic,
+          decoration: TextDecoration.underline,
+        ),
       ),
     ),
   );
