@@ -8,6 +8,7 @@ class AppTheme {
   static const Color red = Color(0xFFFF5659);
 
   static ThemeData lightTheme = ThemeData(
+    scaffoldBackgroundColor: backgroundWhite,
     splashColor: Colors.transparent,
     highlightColor: Colors.transparent,
     floatingActionButtonTheme: FloatingActionButtonThemeData(
@@ -23,6 +24,29 @@ class AppTheme {
       unselectedItemColor: backgroundWhite,
     ),
     bottomAppBarTheme: BottomAppBarTheme(color: primary, elevation: 0),
+    inputDecorationTheme: InputDecorationTheme(
+      hintStyle: TextStyle(
+        fontSize: 16,
+        color: gray,
+        fontWeight: FontWeight.w500,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: gray),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: gray),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: red),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: red),
+      ),
+    ),
   );
   static ThemeData dartTheme = ThemeData();
 }
