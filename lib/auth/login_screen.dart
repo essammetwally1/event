@@ -18,6 +18,15 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(
+          'Login',
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge!.copyWith(color: AppTheme.black),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
@@ -50,7 +59,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                TextButton(onPressed: () {}, child: Text('Create Account')),
+                TextButton(
+                  onPressed: () => Navigator.of(
+                    context,
+                  ).pushReplacementNamed(RegisterScreen.routeName),
+                  child: Text('Create Account'),
+                ),
               ],
             ),
             Row(
