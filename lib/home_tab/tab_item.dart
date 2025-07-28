@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class TapItem extends StatelessWidget {
+class TabItem extends StatelessWidget {
   final String label;
   final IconData icon;
   final bool isSelected;
@@ -9,7 +9,7 @@ class TapItem extends StatelessWidget {
   final Color foreginSelectedColor;
   final Color foreginUnSelectedColor;
 
-  const TapItem({
+  const TabItem({
     super.key,
     required this.label,
     required this.icon,
@@ -38,6 +38,7 @@ class TapItem extends StatelessWidget {
             color: isSelected ? foreginSelectedColor : foreginUnSelectedColor,
             size: 24,
           ),
+          SizedBox(width: 5),
           Text(
             label,
             style: Theme.of(context).textTheme.titleMedium!.copyWith(
