@@ -1,4 +1,5 @@
 import 'package:event/components/navbar_icon.dart';
+import 'package:event/home_tab/home_tab.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,7 +14,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
 
   static const List<Widget> taps = <Widget>[
-    Center(child: Text('Home Page', style: TextStyle(fontSize: 24))),
+    HomeTab(),
     Center(child: Text('Location Page', style: TextStyle(fontSize: 24))),
     Center(child: Text('Favorites Page', style: TextStyle(fontSize: 24))),
     Center(child: Text('Profile Page', style: TextStyle(fontSize: 24))),

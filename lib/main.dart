@@ -4,10 +4,6 @@ import 'package:event/auth/register_scree.dart';
 import 'package:event/home_screen.dart';
 import 'package:flutter/material.dart';
 
-// WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-// FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-// FlutterNativeSplash.remove();
-
 void main() {
   runApp(EventApp());
 }
@@ -19,7 +15,7 @@ class EventApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: LoginScreen.routeName,
+      initialRoute: HomeScreen.routeName,
       routes: {
         HomeScreen.routeName: (context) => HomeScreen(),
         LoginScreen.routeName: (context) => LoginScreen(),
