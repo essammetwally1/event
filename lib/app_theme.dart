@@ -27,7 +27,7 @@ class AppTheme {
     ),
     bottomAppBarTheme: BottomAppBarTheme(color: primary, elevation: 0),
     inputDecorationTheme: InputDecorationTheme(
-      contentPadding: EdgeInsets.all(18),
+      contentPadding: EdgeInsets.all(12),
 
       hintStyle: TextStyle(
         fontSize: 16,
@@ -36,11 +36,11 @@ class AppTheme {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: gray),
+        borderSide: BorderSide(color: primary),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: gray),
+        borderSide: BorderSide(color: primary),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
