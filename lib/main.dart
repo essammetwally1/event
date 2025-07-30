@@ -3,6 +3,7 @@ import 'package:event/auth/login_screen.dart';
 import 'package:event/auth/register_scree.dart';
 import 'package:event/screens/create_event_screen.dart';
 import 'package:event/screens/home_screen.dart';
+import 'package:event/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -16,12 +17,13 @@ class EventApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: HomeScreen.routeName,
+      initialRoute: OnboardingScreen.routeName,
       routes: {
         HomeScreen.routeName: (context) => HomeScreen(),
         LoginScreen.routeName: (context) => LoginScreen(),
         RegisterScreen.routeName: (context) => RegisterScreen(),
         CreateEventScreen.routeName: (context) => CreateEventScreen(),
+        OnboardingScreen.routeName: (context) => OnboardingScreen(),
       },
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.dartTheme,
