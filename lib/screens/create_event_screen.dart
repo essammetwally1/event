@@ -16,6 +16,9 @@ class CreateEventScreen extends StatefulWidget {
 
 class _CreateEventScreenState extends State<CreateEventScreen> {
   int currentIndex = 0;
+  bool rightDate = false;
+  bool rightTime = false;
+  GlobalKey<FormState> globalKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
@@ -73,54 +76,114 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.only(right: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Title',
-                    style: textTheme.titleMedium!.copyWith(
-                      color: AppTheme.black,
+              child: Form(
+                key: globalKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Title',
+                      style: textTheme.titleMedium!.copyWith(
+                        color: AppTheme.black,
+                      ),
                     ),
-                  ),
-                  CustomTextFormField(
-                    hintText: 'Event Title',
-                    iconPathName: 'titleEvent',
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Event Description',
-                    style: textTheme.titleMedium!.copyWith(
-                      color: AppTheme.black,
+                    CustomTextFormField(
+                      hintText: 'Event Title',
+                      iconPathName: 'titleEvent',
+                      validator: (value) {
+                        if (value!.length < 10) {
+                          return 'Invalid';
+                        }
+                        return null;
+                      },
                     ),
-                  ),
-                  CustomTextFormField(maxLines: 4, hintText: 'Description'),
-                  CustomCreateEventRow(
-                    textTheme: textTheme,
-                    label: 'Date',
-                    iconName: 'date',
-                  ),
-                  CustomCreateEventRow(
-                    textTheme: textTheme,
-                    label: 'Time',
-                    iconName: 'time',
-                  ),
-                  Text(
-                    'Location',
-                    style: textTheme.titleMedium!.copyWith(
-                      color: AppTheme.black,
+                    SizedBox(height: 10),
+                    Text(
+                      'Event Description',
+                      style: textTheme.titleMedium!.copyWith(
+                        color: AppTheme.black,
+                      ),
                     ),
-                  ),
+                    CustomTextFormField(maxLines: 4, hintText: 'Description'),
+                    CustomCreateEventRow(
+                      textTheme: textTheme,
+                      label: 'Date',
+                      iconName: 'date',
+                      onPressed: () async {
+                        DateTime? date = await showDatePicker(
+                          context: context,
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime.now().add(Duration(days: 365)),
+                          initialEntryMode: DatePickerEntryMode.calendarOnly,
+                        );
+                        if (date != null) {
+                          rightDate = true;
+                          print(date);
+                        }
+                      },
+                    ),
+                    CustomCreateEventRow(
+                      textTheme: textTheme,
+                      label: 'Time',
+                      iconName: 'time',
+                      onPressed: () async {
+                        TimeOfDay? time = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        if (time != null) {
+                          rightTime = true;
+                          print(time);
+                        }
+                      },
+                    ),
 
-                  CustomElevatedButton(
-                    textElevatedButton: 'Add Event',
-                    onPressed: () {},
-                  ),
-                ],
+                    // Text(
+                    //   'Location',
+                    //   style: textTheme.titleMedium!.copyWith(
+                    //     color: AppTheme.black,
+                    //   ),
+                    // ),
+                    CustomElevatedButton(
+                      textElevatedButton: 'Add Event',
+                      onPressed: addEvent,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  void addEvent() {
+    if (globalKey.currentState!.validate()) {
+      if (!rightTime || !rightDate) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            backgroundColor: AppTheme.backgroundWhite,
+            title: Text(
+              'Selected Time & Date',
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge!.copyWith(color: AppTheme.primary),
+            ),
+            actions: [
+              TextButton(
+                style: TextButton.styleFrom(),
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
+      print('done');
+    }
   }
 }

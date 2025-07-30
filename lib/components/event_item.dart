@@ -1,8 +1,16 @@
 import 'package:event/app_theme.dart';
 import 'package:flutter/material.dart';
 
-class EventItem extends StatelessWidget {
+class EventItem extends StatefulWidget {
   const EventItem({super.key});
+
+  @override
+  State<EventItem> createState() => _EventItemState();
+}
+
+class _EventItemState extends State<EventItem> {
+  IconData icon = Icons.favorite_outline_rounded;
+  bool isLoved = false;
 
   @override
   Widget build(BuildContext context) {
@@ -72,9 +80,16 @@ class EventItem extends StatelessWidget {
                   ),
                   SizedBox(width: 8),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      setState(() {
+                        isLoved = !isLoved;
+                      });
+                    },
                     child: Icon(
-                      Icons.favorite_outline_rounded,
+                      isLoved
+                          ? Icons.favorite_sharp
+                          : Icons.favorite_outline_outlined,
+
                       color: AppTheme.primary,
                       size: 30,
                     ),

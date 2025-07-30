@@ -5,12 +5,14 @@ import 'package:flutter_svg/svg.dart';
 class CustomCreateEventRow extends StatelessWidget {
   final String iconName;
   final String label;
+  final void Function()? onPressed;
 
   const CustomCreateEventRow({
     super.key,
     required this.textTheme,
     required this.iconName,
     required this.label,
+    this.onPressed,
   });
 
   final TextTheme textTheme;
@@ -32,7 +34,7 @@ class CustomCreateEventRow extends StatelessWidget {
         ),
         Spacer(),
         TextButton(
-          onPressed: () {},
+          onPressed: onPressed,
           child: Text('Choose $label', style: textTheme.titleMedium),
         ),
       ],
