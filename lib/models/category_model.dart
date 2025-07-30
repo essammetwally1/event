@@ -17,7 +17,7 @@ class CategoryModel {
       id: '1',
       label: 'Sport',
       icon: Icons.sports,
-      imageName: 'sports',
+      imageName: 'sport',
     ),
     CategoryModel(
       id: '2',

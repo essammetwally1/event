@@ -9,7 +9,17 @@ class AppTheme {
   static const Color red = Color(0xFFFF5659);
 
   static ThemeData lightTheme = ThemeData(
-    appBarTheme: AppBarTheme(backgroundColor: backgroundWhite),
+    appBarTheme: AppBarTheme(
+      backgroundColor: backgroundWhite,
+      foregroundColor: primary,
+      centerTitle: true,
+      titleTextStyle: TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 22,
+        color: primary,
+      ),
+      iconTheme: IconThemeData(size: 30, color: primary),
+    ),
     scaffoldBackgroundColor: backgroundWhite,
     splashColor: Colors.transparent,
     highlightColor: Colors.transparent,

@@ -2,6 +2,7 @@ import 'package:event/components/navbar_icon.dart';
 import 'package:event/home_tab/home_tab.dart';
 import 'package:event/love_tab/love_tab.dart';
 import 'package:event/profile_tab/profile_tab.dart';
+import 'package:event/screens/create_event_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -27,7 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: taps[selectedIndex],
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).pushNamed(CreateEventScreen.routeName);
+        },
         child: Icon(Icons.add, size: 36),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

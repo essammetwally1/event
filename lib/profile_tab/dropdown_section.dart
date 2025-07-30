@@ -57,7 +57,7 @@ class _DropdownSectionState extends State<DropdownSection> {
             ),
             Spacer(),
             Container(
-              width: MediaQuery.sizeOf(context).width * .30,
+              width: MediaQuery.sizeOf(context).width * .4,
               padding: EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),

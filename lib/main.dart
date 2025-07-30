@@ -1,7 +1,8 @@
 import 'package:event/app_theme.dart';
 import 'package:event/auth/login_screen.dart';
 import 'package:event/auth/register_scree.dart';
-import 'package:event/home_screen.dart';
+import 'package:event/screens/create_event_screen.dart';
+import 'package:event/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -20,6 +21,7 @@ class EventApp extends StatelessWidget {
         HomeScreen.routeName: (context) => HomeScreen(),
         LoginScreen.routeName: (context) => LoginScreen(),
         RegisterScreen.routeName: (context) => RegisterScreen(),
+        CreateEventScreen.routeName: (context) => CreateEventScreen(),
       },
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.dartTheme,
