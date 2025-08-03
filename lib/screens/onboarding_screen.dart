@@ -40,12 +40,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(height: 30),
-            Image.asset('assets/Logo.png', height: 171),
+            SizedBox(height: size.height * 0.03),
+            Image.asset(
+              'assets/Logo.png',
+              height: size.height * 0.2,
+              fit: BoxFit.contain,
+            ),
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
@@ -53,27 +59,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onPageChanged: (index) => setState(() => currentPage = index),
                 itemBuilder: (context, index) {
                   final page = OnboardingModel.onboardingPages[index];
-                  return Padding(
-                    padding: const EdgeInsets.all(24.0),
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Image.asset(
-                          page.imageAsset,
-                          height: 250,
-                          width: double.infinity,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          child: Image.asset(
+                            page.imageAsset,
+                            fit: BoxFit.fill,
+                            height: size.height * 0.3,
+                            width: double.infinity,
+                          ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: size.height * 0.02),
                         Text(
                           page.title,
                           style: textTheme.titleLarge!.copyWith(
                             color: AppTheme.primary,
                           ),
                         ),
-                        const SizedBox(height: 32),
+                        SizedBox(height: size.height * 0.02),
                         Text(
                           page.description,
-                          style: textTheme.titleMedium!.copyWith(
+                          style: textTheme.titleSmall!.copyWith(
                             color: AppTheme.black,
                           ),
                         ),
@@ -83,20 +96,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
               ),
             ),
-            currentPage == 0
-                ? Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: CustomElevatedButton(
+            Padding(
+              padding: EdgeInsets.only(
+                bottom: size.height * 0.05,
+                left: 24,
+                right: 24,
+              ),
+              child: currentPage == 0
+                  ? CustomElevatedButton(
                       textElevatedButton: "Let's Start",
                       onPressed: _nextPage,
-                    ),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0,
-                      vertical: 20,
-                    ),
-                    child: Row(
+                    )
+                  : Row(
                       children: [
                         // Back button
                         if (currentPage > 0)
@@ -110,9 +121,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                           )
                         else
-                          const SizedBox(
-                            width: 60,
-                          ), // keeps spacing when no Back button
+                          const SizedBox(width: 60),
                         Expanded(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -135,11 +144,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                           ),
                         ),
-
                         TextButton(
                           onPressed: _nextPage,
                           child: Text(
-                            'Next',
+                            currentPage ==
+                                    OnboardingModel.onboardingPages.length - 1
+                                ? 'Get Started'
+                                : 'Next',
                             style: textTheme.headlineSmall!.copyWith(
                               color: AppTheme.primary,
                             ),
@@ -147,7 +158,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ],
                     ),
-                  ),
+            ),
           ],
         ),
       ),

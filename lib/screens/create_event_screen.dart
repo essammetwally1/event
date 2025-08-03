@@ -4,6 +4,7 @@ import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/components/custom_textfield.dart';
 import 'package:event/home_tab/tab_item.dart';
 import 'package:event/models/category_model.dart';
+import 'package:event/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
 class CreateEventScreen extends StatefulWidget {
@@ -18,6 +19,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   int currentIndex = 0;
   bool rightDate = false;
   bool rightTime = false;
+  DateTime? date;
+  TimeOfDay? time;
   GlobalKey<FormState> globalKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -92,7 +95,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       iconPathName: 'titleEvent',
                       validator: (value) {
                         if (value!.length < 10) {
-                          return 'Invalid';
+                          return 'Title should more than 10 letters';
                         }
                         return null;
                       },
@@ -110,7 +113,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       label: 'Date',
                       iconName: 'date',
                       onPressed: () async {
-                        DateTime? date = await showDatePicker(
+                        date = await showDatePicker(
                           context: context,
                           firstDate: DateTime.now(),
                           lastDate: DateTime.now().add(Duration(days: 365)),
@@ -127,7 +130,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       label: 'Time',
                       iconName: 'time',
                       onPressed: () async {
-                        TimeOfDay? time = await showTimePicker(
+                        time = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay.now(),
                         );
@@ -184,6 +187,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       }
 
       print('done');
+      print('____________________________');
+
+      print(date);
+      print(time);
+      print('____________________________');
+      Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
     }
   }
 }
