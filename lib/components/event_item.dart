@@ -1,8 +1,11 @@
 import 'package:event/app_theme.dart';
+import 'package:event/models/event_model.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class EventItem extends StatefulWidget {
-  const EventItem({super.key});
+  final EventModel event;
+  const EventItem({super.key, required this.event});
 
   @override
   State<EventItem> createState() => _EventItemState();
@@ -23,7 +26,7 @@ class _EventItemState extends State<EventItem> {
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: Image.asset(
-              'assets/categoreis/meeting.png',
+              'assets/categoreis/${widget.event.categoryModel.imageName}.png',
               height: screenSize.height * .25,
               width: screenSize.width,
               fit: BoxFit.fill,
@@ -39,15 +42,15 @@ class _EventItemState extends State<EventItem> {
             child: Column(
               children: [
                 Text(
-                  '1',
+                  widget.event.dateTime.day.toString(),
                   style: textTheme.titleLarge!.copyWith(
                     color: AppTheme.primary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  'Nov',
-                  style: textTheme.titleSmall!.copyWith(
+                  DateFormat('MMM').format(widget.event.dateTime).toUpperCase(),
+                  style: textTheme.titleLarge!.copyWith(
                     color: AppTheme.primary,
                     fontWeight: FontWeight.bold,
                   ),
@@ -67,18 +70,32 @@ class _EventItemState extends State<EventItem> {
               ),
               child: Row(
                 children: [
-                  Expanded(
-                    child: Text(
-                      'Meeting for Updating The Development Method',
-                      style: textTheme.titleMedium!.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.black,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.event.title,
+                        style: textTheme.titleMedium!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.black,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                      SizedBox(width: 8),
+
+                      Text(
+                        widget.event.description,
+                        style: textTheme.titleSmall!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.black,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                  SizedBox(width: 8),
+                  Spacer(),
                   GestureDetector(
                     onTap: () {
                       setState(() {

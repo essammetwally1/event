@@ -8,7 +8,7 @@ class EventModel {
   CategoryModel categoryModel;
   DateTime dateTime;
   EventModel({
-    required this.id,
+    this.id = '',
     required this.title,
     required this.description,
     required this.categoryModel,

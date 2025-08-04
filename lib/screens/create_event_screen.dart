@@ -1,10 +1,11 @@
 import 'package:event/app_theme.dart';
-import 'package:event/components/custom_create_event_row.dart';
+import 'package:event/components/custom_create_eventrow.dart';
 import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/components/custom_textfield.dart';
+import 'package:event/firebase/firebase_service.dart';
 import 'package:event/home_tab/tab_item.dart';
 import 'package:event/models/category_model.dart';
-import 'package:event/screens/home_screen.dart';
+import 'package:event/models/event_model.dart';
 import 'package:flutter/material.dart';
 
 class CreateEventScreen extends StatefulWidget {
@@ -17,10 +18,10 @@ class CreateEventScreen extends StatefulWidget {
 
 class _CreateEventScreenState extends State<CreateEventScreen> {
   int currentIndex = 0;
-  bool rightDate = false;
-  bool rightTime = false;
-  DateTime? date;
-  TimeOfDay? time;
+  TextEditingController? titleController = TextEditingController();
+  TextEditingController? descriptionController = TextEditingController();
+  DateTime? selectedDate;
+  TimeOfDay? selectedTime;
   GlobalKey<FormState> globalKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -93,6 +94,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     CustomTextFormField(
                       hintText: 'Event Title',
                       iconPathName: 'titleEvent',
+                      controller: titleController,
                       validator: (value) {
                         if (value!.length < 10) {
                           return 'Title should more than 10 letters';
@@ -107,37 +109,37 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         color: AppTheme.black,
                       ),
                     ),
-                    CustomTextFormField(maxLines: 4, hintText: 'Description'),
+                    CustomTextFormField(
+                      controller: descriptionController,
+                      maxLines: 4,
+                      hintText: 'Description',
+                    ),
                     CustomCreateEventRow(
                       textTheme: textTheme,
                       label: 'Date',
                       iconName: 'date',
+                      date: selectedDate ?? selectedDate,
                       onPressed: () async {
-                        date = await showDatePicker(
+                        selectedDate = await showDatePicker(
                           context: context,
                           firstDate: DateTime.now(),
                           lastDate: DateTime.now().add(Duration(days: 365)),
                           initialEntryMode: DatePickerEntryMode.calendarOnly,
                         );
-                        if (date != null) {
-                          rightDate = true;
-                          print(date);
-                        }
+                        setState(() {});
                       },
                     ),
                     CustomCreateEventRow(
                       textTheme: textTheme,
                       label: 'Time',
                       iconName: 'time',
+                      time: selectedTime ?? selectedTime,
                       onPressed: () async {
-                        time = await showTimePicker(
+                        selectedTime = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay.now(),
                         );
-                        if (time != null) {
-                          rightTime = true;
-                          print(time);
-                        }
+                        setState(() {});
                       },
                     ),
 
@@ -163,7 +165,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   void addEvent() {
     if (globalKey.currentState!.validate()) {
-      if (!rightTime || !rightDate) {
+      if (selectedDate == null && selectedTime == null) {
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
@@ -183,16 +185,24 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             ],
           ),
         );
-        return;
+      } else {
+        DateTime dateTime = DateTime(
+          selectedDate!.year,
+          selectedDate!.month,
+          selectedDate!.day,
+          selectedTime!.hour,
+          selectedTime!.minute,
+        );
+        EventModel eventModel = EventModel(
+          title: titleController!.text,
+          description: descriptionController!.text,
+          categoryModel: CategoryModel.categoryList[currentIndex],
+          dateTime: dateTime,
+        );
+        FirebaseService.createEvent(eventModel).then((_) {
+          Navigator.of(context).pop();
+        });
       }
-
-      print('done');
-      print('____________________________');
-
-      print(date);
-      print(time);
-      print('____________________________');
-      Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
     }
   }
 }

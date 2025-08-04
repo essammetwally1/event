@@ -21,14 +21,15 @@ class LoveTab extends StatelessWidget {
               ),
             ),
             SizedBox(height: 16),
-            Expanded(
-              child: ListView.separated(
-                padding: EdgeInsets.zero,
-                itemBuilder: (_, index) => EventItem(),
-                separatorBuilder: (_, _) => SizedBox(height: 8),
-                itemCount: 20,
-              ),
-            ),
+
+            // Expanded(
+            //   child: ListView.separated(
+            //     padding: EdgeInsets.zero,
+            //     itemBuilder: (_, index) => EventItem(),
+            //     separatorBuilder: (_, _) => SizedBox(height: 8),
+            //     itemCount: 20,
+            //   ),
+            // ),
           ],
         ),
       ),
