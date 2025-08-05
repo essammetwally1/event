@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class HomeHeader extends StatefulWidget {
-  const HomeHeader({super.key});
+  final void Function(CategoryModel?) filterEvents;
+  const HomeHeader({super.key, required this.filterEvents});
 
   @override
   State<HomeHeader> createState() => _HomeHeaderState();
@@ -54,9 +55,13 @@ class _HomeHeaderState extends State<HomeHeader> {
                 labelPadding: EdgeInsets.only(right: 10),
                 onTap: (index) {
                   if (currentIndex == index) return;
-                  setState(() {
-                    currentIndex = index;
-                  });
+
+                  currentIndex = index;
+                  CategoryModel? categoryModel = currentIndex == 0
+                      ? null
+                      : CategoryModel.categoryList[currentIndex - 1];
+                  widget.filterEvents(categoryModel);
+                  setState(() {});
                 },
                 tabs: [
                   TabItem(

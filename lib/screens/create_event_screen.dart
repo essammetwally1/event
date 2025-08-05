@@ -22,6 +22,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   TextEditingController? descriptionController = TextEditingController();
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
+  bool isLoading = false;
   GlobalKey<FormState> globalKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
