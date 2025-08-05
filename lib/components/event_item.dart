@@ -63,39 +63,40 @@ class _EventItemState extends State<EventItem> {
             right: 8,
             left: 8,
             child: Container(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: AppTheme.backgroundWhite,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.event.title,
-                        style: textTheme.titleMedium!.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.black,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.event.title,
+                          style: textTheme.titleMedium!.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.black,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(width: 8),
-
-                      Text(
-                        widget.event.description,
-                        style: textTheme.titleSmall!.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.black,
+                        const SizedBox(height: 4),
+                        Text(
+                          widget.event.description,
+                          style: textTheme.titleSmall!.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.black,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  Spacer(),
+                  const SizedBox(width: 8),
                   GestureDetector(
                     onTap: () {
                       setState(() {
@@ -106,7 +107,6 @@ class _EventItemState extends State<EventItem> {
                       isLoved
                           ? Icons.favorite_sharp
                           : Icons.favorite_outline_outlined,
-
                       color: AppTheme.primary,
                       size: 30,
                     ),

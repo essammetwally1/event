@@ -144,12 +144,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       },
                     ),
 
-                    // Text(
-                    //   'Location',
-                    //   style: textTheme.titleMedium!.copyWith(
-                    //     color: AppTheme.black,
-                    //   ),
-                    // ),
                     CustomElevatedButton(
                       textElevatedButton: 'Add Event',
                       onPressed: addEvent,

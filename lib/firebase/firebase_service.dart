@@ -27,4 +27,14 @@ class FirebaseService {
     List<EventModel> events = docs.map((event) => event.data()).toList();
     return events;
   }
+
+  static Future<bool> deleteEvent(String eventId) async {
+    CollectionReference<EventModel> eventsCollection = getEventsCollection();
+    try {
+      eventsCollection.doc(eventId).delete().then((_) => true);
+    } catch (e) {
+      print(e.toString());
+    }
+    return false;
+  }
 }
