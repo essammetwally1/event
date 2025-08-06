@@ -20,7 +20,7 @@ class EventApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: HomeScreen.routeName,
+      initialRoute: LoginScreen.routeName,
       routes: {
         HomeScreen.routeName: (context) => HomeScreen(),
         LoginScreen.routeName: (context) => LoginScreen(),

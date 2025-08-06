@@ -25,6 +25,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // final userModel = ModalRoute.of(context)!.settings.arguments as UserModel;
+
     return Scaffold(
       body: taps[selectedIndex],
       floatingActionButton: FloatingActionButton(

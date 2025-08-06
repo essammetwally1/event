@@ -2,6 +2,8 @@ import 'package:event/app_theme.dart';
 import 'package:event/auth/login_screen.dart';
 import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/components/custom_textfield.dart';
+import 'package:event/firebase/firebase_service.dart';
+import 'package:event/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -55,7 +57,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             SizedBox(height: 24),
 
             CustomElevatedButton(
-              onPressed: () {},
+              onPressed: register,
               textElevatedButton: 'Create Account',
             ),
             SizedBox(height: 10),
@@ -81,5 +83,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
     );
+  }
+
+  void register() {
+    FirebaseService.register(
+      name: nameController.text,
+      password: passwordController.text,
+      email: emailController.text,
+    ).then((user) {
+      Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+    });
   }
 }

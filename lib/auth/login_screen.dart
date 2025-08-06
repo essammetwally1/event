@@ -2,6 +2,9 @@ import 'package:event/app_theme.dart';
 import 'package:event/auth/register_scree.dart';
 import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/components/custom_textfield.dart';
+import 'package:event/firebase/firebase_service.dart';
+import 'package:event/screens/home_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -47,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             SizedBox(height: 24),
 
-            CustomElevatedButton(onPressed: () {}, textElevatedButton: 'Login'),
+            CustomElevatedButton(onPressed: login, textElevatedButton: 'Login'),
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -96,5 +99,14 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  void login() {
+    FirebaseService.logIn(
+      email: emailController.text,
+      password: passwordController.text,
+    ).then((user) {
+      Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+    });
   }
 }

@@ -59,7 +59,7 @@ class FirebaseService {
     required String email,
   }) async {
     UserCredential userCredential = await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: password);
+        .createUserWithEmailAndPassword(email: email, password: password);
 
     UserModel userModel = UserModel(
       id: userCredential.user!.uid,
