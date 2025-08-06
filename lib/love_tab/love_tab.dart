@@ -1,5 +1,4 @@
 import 'package:event/components/custom_textfield.dart';
-import 'package:event/components/event_item.dart';
 import 'package:flutter/material.dart';
 
 class LoveTab extends StatelessWidget {
