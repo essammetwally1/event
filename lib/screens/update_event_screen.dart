@@ -9,16 +9,15 @@ import 'package:event/models/event_model.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
-class CreateEventScreen extends StatefulWidget {
-  static const String routeName = '/createevent';
+class UpdateEventScreen extends StatefulWidget {
   final EventModel? eventModel;
-  const CreateEventScreen({super.key, this.eventModel});
+  const UpdateEventScreen({super.key, this.eventModel});
 
   @override
-  State<CreateEventScreen> createState() => _CreateEventScreenState();
+  State<UpdateEventScreen> createState() => _UpdateEventScreenState();
 }
 
-class _CreateEventScreenState extends State<CreateEventScreen> {
+class _UpdateEventScreenState extends State<UpdateEventScreen> {
   int currentIndex = 0;
   TextEditingController? titleController = TextEditingController();
   TextEditingController? descriptionController = TextEditingController();
@@ -34,13 +33,18 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     widget.eventModel != null
         ? currentIndex = int.parse(widget.eventModel!.categoryModel.id) - 1
         : 0;
+
+    titleController!.text = widget.eventModel!.title;
+    descriptionController!.text = widget.eventModel!.description;
+    selectedDate = widget.eventModel!.dateTime;
+    selectedTime = TimeOfDay.fromDateTime(widget.eventModel!.dateTime);
   }
 
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
     return Scaffold(
-      appBar: AppBar(title: Text('Create Event')),
+      appBar: AppBar(title: Text('Update Event')),
       body: Padding(
         padding: const EdgeInsets.only(left: 16, bottom: 16),
         child: ListView(
@@ -105,9 +109,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       ),
                     ),
                     CustomTextFormField(
-                      hintText: widget.eventModel != null
-                          ? widget.eventModel!.title
-                          : 'Event Title',
+                      hintText: widget.eventModel!.title,
+
                       iconPathName: 'titleEvent',
                       controller: titleController,
                       validator: (value) {
@@ -127,15 +130,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     CustomTextFormField(
                       controller: descriptionController,
                       maxLines: 4,
-                      hintText: widget.eventModel != null
-                          ? widget.eventModel!.description
-                          : 'Description',
+                      hintText: widget.eventModel!.description,
                     ),
                     CustomCreateEventRow(
                       textTheme: textTheme,
                       label: 'Date',
                       iconName: 'date',
-                      date: selectedDate ?? selectedDate,
+                      date: selectedDate ?? widget.eventModel!.dateTime,
                       onPressed: () async {
                         selectedDate = await showDatePicker(
                           context: context,
@@ -151,7 +152,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       label: 'Time',
                       iconName: 'time',
 
-                      time: selectedTime ?? selectedTime,
+                      time:
+                          selectedTime ??
+                          TimeOfDay.fromDateTime(widget.eventModel!.dateTime),
                       onPressed: () async {
                         selectedTime = await showTimePicker(
                           context: context,
@@ -162,8 +165,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     ),
 
                     CustomElevatedButton(
-                      textElevatedButton: 'Add Event',
-                      onPressed: addEvent,
+                      textElevatedButton: 'Update Event',
+                      onPressed: updateEvent,
                     ),
                   ],
                 ),
@@ -175,7 +178,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
   }
 
-  void addEvent() {
+  void updateEvent() {
     if (globalKey.currentState!.validate()) {
       if (selectedDate == null && selectedTime == null) {
         showDialog(
@@ -210,10 +213,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           description: descriptionController!.text,
           categoryModel: CategoryModel.categoryList[currentIndex],
           dateTime: dateTime,
+          id: widget.eventModel!.id,
         );
-        FirebaseService.createEvent(eventModel).then((_) {
-          Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
-        });
+        FirebaseService.updateEvent(eventModel);
+        Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
       }
     }
   }

@@ -37,4 +37,9 @@ class FirebaseService {
     }
     return false;
   }
+
+  static Future<void> updateEvent(EventModel event) async {
+    CollectionReference<EventModel> eventsCollection = getEventsCollection();
+    eventsCollection.doc(event.id).update(event.toJson());
+  }
 }

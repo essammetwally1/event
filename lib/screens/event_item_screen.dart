@@ -3,6 +3,7 @@ import 'package:event/components/action_icon_button.dart';
 import 'package:event/firebase/firebase_service.dart';
 import 'package:event/models/event_model.dart';
 import 'package:event/screens/home_screen.dart';
+import 'package:event/screens/update_event_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -19,7 +20,18 @@ class EventItemScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          ActionIconButton(iconPath: 'edit', onPressed: editEvent),
+          ActionIconButton(
+            iconPath: 'edit',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return UpdateEventScreen(eventModel: eventModel);
+                  },
+                ),
+              );
+            },
+          ),
           ActionIconButton(
             iconPath: 'delete',
             onPressed: () {
@@ -138,9 +150,8 @@ class EventItemScreen extends StatelessWidget {
         ],
       ),
     );
+
     confirmed == true ? FirebaseService.deleteEvent(eventId) : null;
     Navigator.of(context).pushNamed(HomeScreen.routeName);
   }
-
-  void editEvent() {}
 }

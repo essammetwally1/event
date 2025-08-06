@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class CustomTextFormField extends StatelessWidget {
-  final String hintText;
+  final String? hintText;
   final String? iconPathName;
   final TextEditingController? controller;
   final void Function(String)? onChange;
@@ -11,7 +11,7 @@ class CustomTextFormField extends StatelessWidget {
   final String? Function(String?)? validator;
   const CustomTextFormField({
     super.key,
-    required this.hintText,
+    this.hintText,
     this.iconPathName,
     this.controller,
     this.onChange,
@@ -25,6 +25,7 @@ class CustomTextFormField extends StatelessWidget {
       validator: validator,
       maxLines: maxLines,
       controller: controller,
+
       onChanged: onChange,
       cursorColor: AppTheme.primary,
       style: Theme.of(context).textTheme.titleMedium,
