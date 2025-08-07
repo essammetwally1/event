@@ -7,6 +7,7 @@ class AppTheme {
   static const Color backgroundDark = Color(0xFF101127);
   static const Color black = Color(0xFF1C1C1C);
   static const Color red = Color(0xFFFF5659);
+  static const Color green = Colors.green;
 
   static ThemeData lightTheme = ThemeData(
     appBarTheme: AppBarTheme(

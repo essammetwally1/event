@@ -4,6 +4,8 @@ import 'package:event/firebase/firebase_service.dart';
 import 'package:event/models/event_model.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:event/screens/update_event_screen.dart';
+import 'package:event/utilis.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -151,7 +153,19 @@ class EventItemScreen extends StatelessWidget {
       ),
     );
 
-    confirmed == true ? FirebaseService.deleteEvent(eventId) : null;
-    Navigator.of(context).pushNamed(HomeScreen.routeName);
+    confirmed == true
+        ? FirebaseService.deleteEvent(eventId)
+              .then((_) {
+                Navigator.of(context).pushNamed(HomeScreen.routeName);
+                Utils.showSuccessMessage('Event Deleted');
+              })
+              .catchError((error) {
+                String? message;
+                if (error is FirebaseException) {
+                  message = error.message;
+                }
+                Utils.showErrorMessage(message);
+              })
+        : null;
   }
 }

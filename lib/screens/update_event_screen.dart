@@ -7,6 +7,8 @@ import 'package:event/home_tab/tab_item.dart';
 import 'package:event/models/category_model.dart';
 import 'package:event/models/event_model.dart';
 import 'package:event/screens/home_screen.dart';
+import 'package:event/utilis.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class UpdateEventScreen extends StatefulWidget {
@@ -215,8 +217,18 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
           dateTime: dateTime,
           id: widget.eventModel!.id,
         );
-        FirebaseService.updateEvent(eventModel);
-        Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+        FirebaseService.updateEvent(eventModel)
+            .then((_) {
+              Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+              Utils.showSuccessMessage('Event Updated');
+            })
+            .catchError((error) {
+              String? message;
+              if (error is FirebaseException) {
+                message = error.message;
+              }
+              Utils.showErrorMessage(message);
+            });
       }
     }
   }

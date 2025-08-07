@@ -4,6 +4,8 @@ import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/components/custom_textfield.dart';
 import 'package:event/firebase/firebase_service.dart';
 import 'package:event/screens/home_screen.dart';
+import 'package:event/utilis.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -124,12 +126,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void register() {
     if (globalKey.currentState!.validate()) {
       FirebaseService.register(
-        name: nameController.text,
-        password: passwordController.text,
-        email: emailController.text,
-      ).then((user) {
-        Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
-      });
+            name: nameController.text,
+            password: passwordController.text,
+            email: emailController.text,
+          )
+          .then((user) {
+            Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+            Utils.showSuccessMessage('Register Succes');
+          })
+          .catchError((error) {
+            String? message;
+            if (error is FirebaseException) {
+              message = error.message;
+            }
+            Utils.showErrorMessage(message);
+          });
     }
   }
 }

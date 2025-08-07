@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event/app_theme.dart';
 import 'package:event/auth/register_scree.dart';
 import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/components/custom_textfield.dart';
 import 'package:event/firebase/firebase_service.dart';
 import 'package:event/screens/home_screen.dart';
+import 'package:event/utilis.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -22,7 +24,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         centerTitle: true,
         title: Text(
@@ -38,8 +39,8 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Form(
             key: globalKey,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                SizedBox(height: 50),
                 Image.asset('assets/Logo.png'),
                 SizedBox(height: 24),
                 CustomTextFormField(
@@ -133,11 +134,20 @@ class _LoginScreenState extends State<LoginScreen> {
   void login() {
     if (globalKey.currentState!.validate()) {
       FirebaseService.logIn(
-        email: emailController.text,
-        password: passwordController.text,
-      ).then((user) {
-        Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
-      });
+            email: emailController.text,
+            password: passwordController.text,
+          )
+          .then((user) {
+            Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+            Utils.showSuccessMessage('Login Success');
+          })
+          .catchError((error) {
+            String? message;
+            if (error is FirebaseException) {
+              message = error.message;
+            }
+            Utils.showErrorMessage(message);
+          });
     }
   }
 }

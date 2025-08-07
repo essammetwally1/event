@@ -7,6 +7,8 @@ import 'package:event/home_tab/tab_item.dart';
 import 'package:event/models/category_model.dart';
 import 'package:event/models/event_model.dart';
 import 'package:event/screens/home_screen.dart';
+import 'package:event/utilis.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class CreateEventScreen extends StatefulWidget {
@@ -211,9 +213,18 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           categoryModel: CategoryModel.categoryList[currentIndex],
           dateTime: dateTime,
         );
-        FirebaseService.createEvent(eventModel).then((_) {
-          Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
-        });
+        FirebaseService.createEvent(eventModel)
+            .then((_) {
+              Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+              Utils.showSuccessMessage('Evenet Created');
+            })
+            .catchError((error) {
+              String? message;
+              if (error is FirebaseException) {
+                message = error.message;
+              }
+              Utils.showErrorMessage(message);
+            });
       }
     }
   }
