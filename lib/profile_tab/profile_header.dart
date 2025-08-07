@@ -2,9 +2,8 @@ import 'package:event/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class ProfileHeader extends StatelessWidget {
-  const ProfileHeader({super.key, required this.textTheme});
-
   final TextTheme textTheme;
+  const ProfileHeader({super.key, required this.textTheme});
 
   @override
   Widget build(BuildContext context) {
