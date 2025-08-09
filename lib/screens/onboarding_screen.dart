@@ -1,7 +1,7 @@
 import 'package:event/app_theme.dart';
+import 'package:event/auth/login_screen.dart';
 import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/models/onboarding_model.dart';
-import 'package:event/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -24,7 +24,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+      Navigator.pushReplacementNamed(context, LoginScreen.routeName);
     }
   }
 

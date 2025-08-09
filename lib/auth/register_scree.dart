@@ -52,7 +52,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Enter Name';
-                    } else if (value!.length < 4) {
+                    } else if (value.length < 4) {
                       return 'Name must be 4 or more letters';
                     } else {
                       return null;

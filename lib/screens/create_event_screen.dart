@@ -6,10 +6,12 @@ import 'package:event/firebase/firebase_service.dart';
 import 'package:event/home_tab/tab_item.dart';
 import 'package:event/models/category_model.dart';
 import 'package:event/models/event_model.dart';
+import 'package:event/provider/event_provider.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:event/utilis.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class CreateEventScreen extends StatefulWidget {
   static const String routeName = '/createevent';
@@ -31,7 +33,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     widget.eventModel != null
         ? currentIndex = int.parse(widget.eventModel!.categoryModel.id) - 1
@@ -208,6 +209,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           selectedTime!.minute,
         );
         EventModel eventModel = EventModel(
+          userId: FirebaseAuth.instance.currentUser!.uid,
           title: titleController!.text,
           description: descriptionController!.text,
           categoryModel: CategoryModel.categoryList[currentIndex],
@@ -217,6 +219,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             .then((_) {
               Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
               Utils.showSuccessMessage('Evenet Created');
+              Provider.of<EventProvider>(context, listen: false).getEvents();
             })
             .catchError((error) {
               String? message;

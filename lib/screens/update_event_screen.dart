@@ -30,7 +30,6 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     widget.eventModel != null
         ? currentIndex = int.parse(widget.eventModel!.categoryModel.id) - 1
@@ -211,6 +210,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
           selectedTime!.minute,
         );
         EventModel eventModel = EventModel(
+          userId: FirebaseAuth.instance.currentUser!.uid,
           title: titleController!.text,
           description: descriptionController!.text,
           categoryModel: CategoryModel.categoryList[currentIndex],

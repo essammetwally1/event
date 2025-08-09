@@ -1,10 +1,9 @@
 import 'package:event/components/event_item.dart';
-import 'package:event/firebase/firebase_service.dart';
 import 'package:event/home_tab/home_header.dart';
-import 'package:event/models/category_model.dart';
-import 'package:event/models/event_model.dart';
+import 'package:event/provider/event_provider.dart';
 import 'package:event/screens/event_item_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -14,23 +13,15 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
-  List<EventModel> filteredEvents = [];
-  List<EventModel> allEvents = [];
-
-  @override
-  void initState() {
-    super.initState();
-    getEvents();
-  }
-
   @override
   Widget build(BuildContext context) {
+    EventProvider eventProvider = Provider.of<EventProvider>(context);
     return Scaffold(
       body: Column(
         children: [
-          HomeHeader(filterEvents: filterEvents),
+          HomeHeader(),
           SizedBox(height: 16),
-          filteredEvents.isNotEmpty
+          eventProvider.filteredEvents.isNotEmpty
               ? Expanded(
                   child: ListView.separated(
                     padding: EdgeInsets.zero,
@@ -40,36 +31,23 @@ class _HomeTabState extends State<HomeTab> {
                           MaterialPageRoute(
                             builder: (context) {
                               return EventItemScreen(
-                                eventModel: filteredEvents[index],
+                                eventModel: eventProvider.filteredEvents[index],
                               );
                             },
                           ),
                         );
                       },
-                      child: EventItem(event: filteredEvents[index]),
+                      child: EventItem(
+                        event: eventProvider.filteredEvents[index],
+                      ),
                     ),
                     separatorBuilder: (_, _) => SizedBox(height: 8),
-                    itemCount: filteredEvents.length,
+                    itemCount: eventProvider.filteredEvents.length,
                   ),
                 )
               : Text(''),
         ],
       ),
     );
-  }
-
-  Future<void> getEvents() async {
-    allEvents = await FirebaseService.getEvents();
-    filteredEvents = allEvents;
-    setState(() {});
-  }
-
-  void filterEvents(CategoryModel? categoryModel) {
-    categoryModel == null
-        ? filteredEvents = allEvents
-        : filteredEvents = allEvents
-              .where((event) => event.categoryModel == categoryModel)
-              .toList();
-    setState(() {});
   }
 }

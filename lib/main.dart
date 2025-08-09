@@ -1,16 +1,23 @@
 import 'package:event/app_theme.dart';
 import 'package:event/auth/login_screen.dart';
 import 'package:event/auth/register_scree.dart';
+import 'package:event/provider/event_provider.dart';
 import 'package:event/screens/create_event_screen.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:event/screens/onboarding_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(EventApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => EventProvider()..getEvents(),
+      child: EventApp(),
+    ),
+  );
 }
 
 class EventApp extends StatelessWidget {
@@ -20,7 +27,7 @@ class EventApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: LoginScreen.routeName,
+      initialRoute: HomeScreen.routeName,
       routes: {
         HomeScreen.routeName: (context) => HomeScreen(),
         LoginScreen.routeName: (context) => LoginScreen(),

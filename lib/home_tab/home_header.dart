@@ -1,12 +1,13 @@
 import 'package:event/app_theme.dart';
 import 'package:event/home_tab/tab_item.dart';
 import 'package:event/models/category_model.dart';
+import 'package:event/provider/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 class HomeHeader extends StatefulWidget {
-  final void Function(CategoryModel?) filterEvents;
-  const HomeHeader({super.key, required this.filterEvents});
+  const HomeHeader({super.key});
 
   @override
   State<HomeHeader> createState() => _HomeHeaderState();
@@ -60,7 +61,10 @@ class _HomeHeaderState extends State<HomeHeader> {
                   CategoryModel? categoryModel = currentIndex == 0
                       ? null
                       : CategoryModel.categoryList[currentIndex - 1];
-                  widget.filterEvents(categoryModel);
+                  Provider.of<EventProvider>(
+                    context,
+                    listen: false,
+                  ).filterEvents(categoryModel);
                   setState(() {});
                 },
                 tabs: [

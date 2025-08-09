@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class FirebaseService {
   static CollectionReference<EventModel> getEventsCollection() =>
       FirebaseFirestore.instance
-          .collection('event')
+          .collection('events')
           .withConverter<EventModel>(
             fromFirestore: (docSnapshot, _) =>
                 EventModel.fromJson(docSnapshot.data()!),
@@ -65,6 +65,7 @@ class FirebaseService {
       id: userCredential.user!.uid,
       name: name,
       email: email,
+      favouriteEventsIds: [],
     );
 
     CollectionReference<UserModel> usersCollection = getUsersCollection();
@@ -88,4 +89,24 @@ class FirebaseService {
   }
 
   static Future<void> signOut() => FirebaseAuth.instance.signOut();
+
+  static Future<void> addEventToFavourite(String eventId) async {
+    CollectionReference<UserModel> usersCollection = getUsersCollection();
+    DocumentReference<UserModel> userDoc = usersCollection.doc(
+      FirebaseAuth.instance.currentUser!.uid,
+    );
+    userDoc.update({
+      'favouriteEventsIds': FieldValue.arrayUnion([eventId]),
+    });
+  }
+
+  static Future<void> removeEventFromFavourite(String eventId) async {
+    CollectionReference<UserModel> usersCollection = getUsersCollection();
+    DocumentReference<UserModel> userDoc = usersCollection.doc(
+      FirebaseAuth.instance.currentUser!.uid,
+    );
+    userDoc.update({
+      'favouriteEventsIds': FieldValue.arrayRemove([eventId]),
+    });
+  }
 }
