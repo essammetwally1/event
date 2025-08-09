@@ -3,10 +3,13 @@ import 'package:event/auth/login_screen.dart';
 import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/components/custom_textfield.dart';
 import 'package:event/firebase/firebase_service.dart';
+import 'package:event/models/user_model.dart';
+import 'package:event/provider/user_provider.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:event/utilis.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   static const routeName = '/register';
@@ -132,6 +135,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           )
           .then((user) {
             Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+            Provider.of<UserProvider>(context).updateCurrentUder(user);
             Utils.showSuccessMessage('Register Succes');
           })
           .catchError((error) {

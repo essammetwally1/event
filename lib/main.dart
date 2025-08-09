@@ -2,6 +2,7 @@ import 'package:event/app_theme.dart';
 import 'package:event/auth/login_screen.dart';
 import 'package:event/auth/register_scree.dart';
 import 'package:event/provider/event_provider.dart';
+import 'package:event/provider/user_provider.dart';
 import 'package:event/screens/create_event_screen.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:event/screens/onboarding_screen.dart';
@@ -13,8 +14,11 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => EventProvider()..getEvents(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => EventProvider()..getEvents()),
+        ChangeNotifierProvider(create: (context) => UserProvider()),
+      ],
       child: EventApp(),
     ),
   );

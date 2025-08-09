@@ -4,9 +4,11 @@ import 'package:event/auth/register_scree.dart';
 import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/components/custom_textfield.dart';
 import 'package:event/firebase/firebase_service.dart';
+import 'package:event/provider/user_provider.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:event/utilis.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = '/login';
@@ -139,6 +141,10 @@ class _LoginScreenState extends State<LoginScreen> {
           )
           .then((user) {
             Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+            Provider.of<UserProvider>(
+              context,
+              listen: false,
+            ).updateCurrentUder(user);
             Utils.showSuccessMessage('Login Success');
           })
           .catchError((error) {
