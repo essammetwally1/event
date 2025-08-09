@@ -3,7 +3,6 @@ import 'package:event/auth/login_screen.dart';
 import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/components/custom_textfield.dart';
 import 'package:event/firebase/firebase_service.dart';
-import 'package:event/models/user_model.dart';
 import 'package:event/provider/user_provider.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:event/utilis.dart';
@@ -134,8 +133,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             email: emailController.text,
           )
           .then((user) {
+            Provider.of<UserProvider>(context).updateCurrentUser(user);
+
             Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
-            Provider.of<UserProvider>(context).updateCurrentUder(user);
             Utils.showSuccessMessage('Register Succes');
           })
           .catchError((error) {

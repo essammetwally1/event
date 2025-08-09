@@ -3,8 +3,10 @@ import 'package:event/auth/login_screen.dart';
 import 'package:event/firebase/firebase_service.dart';
 import 'package:event/profile_tab/dropdown_section.dart';
 import 'package:event/profile_tab/profile_header.dart';
+import 'package:event/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 class ProfileTab extends StatelessWidget {
   static const String routeName = '/profile';
@@ -28,7 +30,15 @@ class ProfileTab extends StatelessWidget {
           InkWell(
             onTap: () async {
               FirebaseService.signOut();
-              Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+              Navigator.pushReplacementNamed(
+                context,
+                LoginScreen.routeName,
+              ).then((_) {
+                Provider.of<UserProvider>(
+                  context,
+                  listen: false,
+                ).updateCurrentUser(null);
+              });
             },
             child: Container(
               padding: EdgeInsets.all(16),

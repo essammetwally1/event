@@ -140,11 +140,12 @@ class _LoginScreenState extends State<LoginScreen> {
             password: passwordController.text,
           )
           .then((user) {
-            Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
             Provider.of<UserProvider>(
               context,
               listen: false,
-            ).updateCurrentUder(user);
+            ).updateCurrentUser(user);
+            Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+
             Utils.showSuccessMessage('Login Success');
           })
           .catchError((error) {

@@ -2,6 +2,7 @@ import 'package:event/app_theme.dart';
 import 'package:event/home_tab/tab_item.dart';
 import 'package:event/models/category_model.dart';
 import 'package:event/provider/event_provider.dart';
+import 'package:event/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +34,10 @@ class _HomeHeaderState extends State<HomeHeader> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Welcome Back ✨', style: textTheme.titleSmall),
-            Text('User Name', style: textTheme.headlineSmall),
+            Text(
+              Provider.of<UserProvider>(context).currentUser!.name,
+              style: textTheme.headlineSmall,
+            ),
             SizedBox(height: 5),
 
             Row(
