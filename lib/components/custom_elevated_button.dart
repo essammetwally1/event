@@ -1,12 +1,15 @@
+import 'package:event/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class CustomElevatedButton extends StatelessWidget {
   final String textElevatedButton;
   final VoidCallback onPressed;
+  final bool isLoading;
   const CustomElevatedButton({
     super.key,
     required this.textElevatedButton,
     required this.onPressed,
+    this.isLoading = false,
   });
 
   @override
@@ -16,7 +19,11 @@ class CustomElevatedButton extends StatelessWidget {
         fixedSize: Size(MediaQuery.sizeOf(context).width, 56),
       ),
       onPressed: onPressed,
-      child: Text(textElevatedButton, style: TextTheme.of(context).titleLarge),
+      child: isLoading
+          ? Center(
+              child: CircularProgressIndicator(color: AppTheme.backgroundWhite),
+            )
+          : Text(textElevatedButton, style: TextTheme.of(context).titleLarge),
     );
   }
 }

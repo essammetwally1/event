@@ -133,7 +133,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             email: emailController.text,
           )
           .then((user) {
-            Provider.of<UserProvider>(context).updateCurrentUser(user);
+            Provider.of<UserProvider>(
+              context,
+              listen: false,
+            ).updateCurrentUser(user);
 
             Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
             Utils.showSuccessMessage('Register Succes');

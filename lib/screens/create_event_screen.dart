@@ -165,6 +165,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     ),
 
                     CustomElevatedButton(
+                      isLoading: isLoading,
+
                       textElevatedButton: 'Add Event',
                       onPressed: addEvent,
                     ),
@@ -201,6 +203,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           ),
         );
       } else {
+        if (isLoading == false) {
+          isLoading = true;
+          setState(() {});
+        }
         DateTime dateTime = DateTime(
           selectedDate!.year,
           selectedDate!.month,

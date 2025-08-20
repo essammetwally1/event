@@ -1,7 +1,10 @@
 import 'package:event/app_theme.dart';
 import 'package:event/models/event_model.dart';
+import 'package:event/provider/event_provider.dart';
+import 'package:event/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class EventItem extends StatefulWidget {
   final EventModel event;
@@ -12,11 +15,12 @@ class EventItem extends StatefulWidget {
 }
 
 class _EventItemState extends State<EventItem> {
-  IconData icon = Icons.favorite_outline_rounded;
-  bool isLoved = false;
+  late bool isLoved;
 
   @override
   Widget build(BuildContext context) {
+    UserProvider userProvider = Provider.of<UserProvider>(context);
+    isLoved = userProvider.isFavourite(widget.event.id);
     Size screenSize = MediaQuery.sizeOf(context);
     TextTheme textTheme = Theme.of(context).textTheme;
     return Padding(
@@ -99,9 +103,18 @@ class _EventItemState extends State<EventItem> {
                   const SizedBox(width: 8),
                   GestureDetector(
                     onTap: () {
-                      setState(() {
-                        isLoved = !isLoved;
-                      });
+                      if (isLoved) {
+                        userProvider.removeEventToFavourite(widget.event.id);
+                        Provider.of<EventProvider>(
+                          context,
+                          listen: false,
+                        ).filterFavouriteEvents(
+                          userProvider.currentUser!.favouriteEventsIds,
+                        );
+                      } else {
+                        userProvider.addEventToFavourite(widget.event.id);
+                      }
+                      setState(() {});
                     },
                     child: Icon(
                       isLoved

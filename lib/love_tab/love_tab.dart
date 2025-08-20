@@ -1,12 +1,37 @@
 import 'package:event/components/custom_textfield.dart';
+import 'package:event/components/event_item.dart';
+import 'package:event/provider/event_provider.dart';
+import 'package:event/provider/user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class LoveTab extends StatelessWidget {
+class LoveTab extends StatefulWidget {
   static const String routeName = '/love';
   const LoveTab({super.key});
 
   @override
+  State<LoveTab> createState() => _LoveTabState();
+}
+
+class _LoveTabState extends State<LoveTab> {
+  late EventProvider eventProvider;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      List<String> favouriteIds = Provider.of<UserProvider>(
+        context,
+        listen: false,
+      ).currentUser!.favouriteEventsIds;
+      eventProvider.filterFavouriteEvents(favouriteIds);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    eventProvider = Provider.of<EventProvider>(context);
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -21,14 +46,15 @@ class LoveTab extends StatelessWidget {
             ),
             SizedBox(height: 16),
 
-            // Expanded(
-            //   child: ListView.separated(
-            //     padding: EdgeInsets.zero,
-            //     itemBuilder: (_, index) => EventItem(),
-            //     separatorBuilder: (_, _) => SizedBox(height: 8),
-            //     itemCount: 20,
-            //   ),
-            // ),
+            Expanded(
+              child: ListView.separated(
+                padding: EdgeInsets.zero,
+                itemBuilder: (_, index) =>
+                    EventItem(event: eventProvider.favouriteEvents[index]),
+                separatorBuilder: (_, _) => SizedBox(height: 8),
+                itemCount: eventProvider.favouriteEvents.length,
+              ),
+            ),
           ],
         ),
       ),
