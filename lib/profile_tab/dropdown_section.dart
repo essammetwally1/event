@@ -1,6 +1,8 @@
 import 'package:event/app_theme.dart';
 import 'package:event/profile_tab/language_model.dart';
+import 'package:event/provider/settings_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DropdownSection extends StatefulWidget {
   const DropdownSection({super.key});
@@ -16,9 +18,13 @@ class _DropdownSectionState extends State<DropdownSection> {
   ];
   String menuValue = 'en';
   bool isActiveSwitch = true;
+  late bool isDark;
 
   @override
   Widget build(BuildContext context) {
+    SettingsProvider settingsProvider = Provider.of<SettingsProvider>(context);
+    isDark = settingsProvider.isDark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -27,7 +33,7 @@ class _DropdownSectionState extends State<DropdownSection> {
             Text(
               'Dark Theme',
               style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                color: AppTheme.black,
+                color: isDark ? AppTheme.backgroundWhite : AppTheme.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -35,11 +41,11 @@ class _DropdownSectionState extends State<DropdownSection> {
             Switch(
               activeTrackColor: AppTheme.primary,
               inactiveTrackColor: AppTheme.backgroundWhite,
-              value: isActiveSwitch,
-              onChanged: (_) {
-                setState(() {
-                  isActiveSwitch = !isActiveSwitch;
-                });
+              value: isDark,
+              onChanged: (value) {
+                settingsProvider.changeTheme(
+                  value ? ThemeMode.dark : ThemeMode.light,
+                );
               },
             ),
           ],
@@ -51,7 +57,7 @@ class _DropdownSectionState extends State<DropdownSection> {
             Text(
               'Language',
               style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                color: AppTheme.black,
+                color: isDark ? AppTheme.backgroundWhite : AppTheme.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -66,7 +72,10 @@ class _DropdownSectionState extends State<DropdownSection> {
               child: DropdownButton(
                 value: menuValue,
                 borderRadius: BorderRadius.circular(16),
-                dropdownColor: AppTheme.backgroundWhite,
+
+                dropdownColor: isDark
+                    ? AppTheme.backgroundDark
+                    : AppTheme.backgroundWhite,
 
                 iconEnabledColor: AppTheme.primary,
 

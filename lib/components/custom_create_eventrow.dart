@@ -1,7 +1,9 @@
 import 'package:event/app_theme.dart';
+import 'package:event/provider/settings_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class CustomCreateEventRow extends StatelessWidget {
   final String iconName;
@@ -10,7 +12,7 @@ class CustomCreateEventRow extends StatelessWidget {
   final DateTime? date;
   final TimeOfDay? time;
 
-  const CustomCreateEventRow({
+  CustomCreateEventRow({
     super.key,
     required this.textTheme,
     required this.iconName,
@@ -21,21 +23,30 @@ class CustomCreateEventRow extends StatelessWidget {
   });
 
   final TextTheme textTheme;
+  late bool isDark;
 
   @override
   Widget build(BuildContext context) {
+    isDark = Provider.of<SettingsProvider>(context).isDark;
+
     return Row(
       children: [
         SvgPicture.asset(
           'assets/icons/$iconName.svg',
           height: 20,
           width: 20,
+
           fit: BoxFit.fill,
+          colorFilter: isDark
+              ? const ColorFilter.mode(Colors.white, BlendMode.srcIn)
+              : null,
         ),
         SizedBox(width: 8),
         Text(
           'Event $label',
-          style: textTheme.titleMedium!.copyWith(color: AppTheme.black),
+          style: textTheme.titleMedium!.copyWith(
+            color: isDark ? AppTheme.backgroundWhite : AppTheme.black,
+          ),
         ),
         Spacer(),
         TextButton(

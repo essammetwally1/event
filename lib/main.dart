@@ -2,6 +2,7 @@ import 'package:event/app_theme.dart';
 import 'package:event/auth/login_screen.dart';
 import 'package:event/auth/register_scree.dart';
 import 'package:event/provider/event_provider.dart';
+import 'package:event/provider/settings_provider.dart';
 import 'package:event/provider/user_provider.dart';
 import 'package:event/screens/create_event_screen.dart';
 import 'package:event/screens/home_screen.dart';
@@ -18,6 +19,7 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => EventProvider()..getEvents()),
         ChangeNotifierProvider(create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => SettingsProvider()),
       ],
       child: EventApp(),
     ),
@@ -31,7 +33,7 @@ class EventApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: LoginScreen.routeName,
+      initialRoute: OnboardingScreen.routeName,
       routes: {
         HomeScreen.routeName: (context) => HomeScreen(),
         LoginScreen.routeName: (context) => LoginScreen(),
@@ -41,7 +43,7 @@ class EventApp extends StatelessWidget {
       },
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.dartTheme,
-      themeMode: ThemeMode.light,
+      themeMode: Provider.of<SettingsProvider>(context).themeMode,
     );
   }
 }

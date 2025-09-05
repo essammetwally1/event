@@ -1,9 +1,12 @@
+import 'package:event/app_theme.dart';
 import 'package:event/components/navbar_icon.dart';
 import 'package:event/home_tab/home_tab.dart';
 import 'package:event/love_tab/love_tab.dart';
 import 'package:event/profile_tab/profile_tab.dart';
+import 'package:event/provider/settings_provider.dart';
 import 'package:event/screens/create_event_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = '/home';
@@ -28,6 +31,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: taps[selectedIndex],
       floatingActionButton: FloatingActionButton(
+        shape: Provider.of<SettingsProvider>(context).isDark
+            ? CircleBorder(
+                side: BorderSide(color: AppTheme.backgroundWhite, width: 4),
+              )
+            : null,
         onPressed: () {
           Navigator.of(
             context,

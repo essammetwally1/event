@@ -2,7 +2,9 @@ import 'package:event/app_theme.dart';
 import 'package:event/auth/login_screen.dart';
 import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/models/onboarding_model.dart';
+import 'package:event/provider/settings_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class OnboardingScreen extends StatefulWidget {
   static const String routeName = '/onboarding';
@@ -16,6 +18,7 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int currentPage = 0;
+  late bool isDark;
 
   void _nextPage() {
     if (currentPage < OnboardingModel.onboardingPages.length - 1) {
@@ -41,6 +44,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final size = MediaQuery.of(context).size;
+    isDark = Provider.of<SettingsProvider>(context).isDark;
 
     return Scaffold(
       body: SafeArea(
@@ -87,7 +91,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Text(
                           page.description,
                           style: textTheme.titleSmall!.copyWith(
-                            color: AppTheme.black,
+                            color: isDark
+                                ? AppTheme.backgroundWhite
+                                : AppTheme.black,
                           ),
                         ),
                       ],
@@ -115,7 +121,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             onPressed: _previousPage,
                             child: Text(
                               'Back',
-                              style: textTheme.headlineSmall!.copyWith(
+                              style: textTheme.titleLarge!.copyWith(
                                 color: AppTheme.primary,
                               ),
                             ),
@@ -151,7 +157,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     OnboardingModel.onboardingPages.length - 1
                                 ? 'Get Started'
                                 : 'Next',
-                            style: textTheme.headlineSmall!.copyWith(
+                            style: textTheme.titleLarge!.copyWith(
                               color: AppTheme.primary,
                             ),
                           ),

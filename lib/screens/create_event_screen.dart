@@ -7,6 +7,7 @@ import 'package:event/home_tab/tab_item.dart';
 import 'package:event/models/category_model.dart';
 import 'package:event/models/event_model.dart';
 import 'package:event/provider/event_provider.dart';
+import 'package:event/provider/settings_provider.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:event/utilis.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,6 +31,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   TimeOfDay? selectedTime;
   bool isLoading = false;
   GlobalKey<FormState> globalKey = GlobalKey<FormState>();
+  late bool isDark;
 
   @override
   void initState() {
@@ -42,8 +44,17 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
+    isDark = Provider.of<SettingsProvider>(context).isDark;
     return Scaffold(
-      appBar: AppBar(title: Text('Create Event')),
+      appBar: AppBar(
+        title: Text('Create Event'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppTheme.primary),
+          onPressed: () {
+            Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+          },
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.only(left: 16, bottom: 16),
         child: ListView(
@@ -85,8 +96,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                             currentIndex ==
                             CategoryModel.categoryList.indexOf(category),
                         selectedBackgroundColor: AppTheme.primary,
-                        unSelectedBackgroundColor: AppTheme.backgroundWhite,
-                        foreginSelectedColor: AppTheme.backgroundWhite,
+                        unSelectedBackgroundColor: isDark
+                            ? AppTheme.backgroundDark
+                            : AppTheme.backgroundWhite,
+                        foreginSelectedColor: isDark
+                            ? AppTheme.black
+                            : AppTheme.backgroundWhite,
                         foreginUnSelectedColor: AppTheme.primary,
                       ),
                     )
@@ -104,7 +119,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     Text(
                       'Title',
                       style: textTheme.titleMedium!.copyWith(
-                        color: AppTheme.black,
+                        color: isDark
+                            ? AppTheme.backgroundWhite
+                            : AppTheme.black,
                       ),
                     ),
                     CustomTextFormField(
@@ -124,7 +141,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     Text(
                       'Event Description',
                       style: textTheme.titleMedium!.copyWith(
-                        color: AppTheme.black,
+                        color: isDark
+                            ? AppTheme.backgroundWhite
+                            : AppTheme.black,
                       ),
                     ),
                     CustomTextFormField(

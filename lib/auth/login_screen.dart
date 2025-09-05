@@ -4,6 +4,7 @@ import 'package:event/auth/register_scree.dart';
 import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/components/custom_textfield.dart';
 import 'package:event/firebase/firebase_service.dart';
+import 'package:event/provider/settings_provider.dart';
 import 'package:event/provider/user_provider.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:event/utilis.dart';
@@ -22,9 +23,12 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   GlobalKey<FormState> globalKey = GlobalKey<FormState>();
+  late bool isDark;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
+    isDark = Provider.of<SettingsProvider>(context).isDark;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -78,6 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(height: 24),
 
                 CustomElevatedButton(
+                  isLoading: isLoading,
                   onPressed: login,
                   textElevatedButton: 'Login',
                 ),
@@ -87,10 +92,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Text(
                       'Don’t Have Account ?',
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        color: AppTheme.black,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: isDark
+                          ? Theme.of(context).textTheme.titleMedium!.copyWith(
+                              color: AppTheme.backgroundWhite,
+                              fontWeight: FontWeight.w500,
+                            )
+                          : Theme.of(context).textTheme.titleMedium!.copyWith(
+                              color: AppTheme.black,
+                              fontWeight: FontWeight.w500,
+                            ),
                     ),
                     TextButton(
                       onPressed: () => Navigator.of(
@@ -135,6 +145,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void login() {
     if (globalKey.currentState!.validate()) {
+      if (isLoading == false) {
+        isLoading = true;
+        setState(() {});
+      }
       FirebaseService.logIn(
             email: emailController.text,
             password: passwordController.text,

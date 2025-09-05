@@ -2,6 +2,7 @@ import 'package:event/app_theme.dart';
 import 'package:event/components/action_icon_button.dart';
 import 'package:event/firebase/firebase_service.dart';
 import 'package:event/models/event_model.dart';
+import 'package:event/provider/settings_provider.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:event/screens/update_event_screen.dart';
 import 'package:event/utilis.dart';
@@ -9,16 +10,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class EventItemScreen extends StatelessWidget {
   static const String routeName = '/eventitemscreen';
   final EventModel eventModel;
+  late bool isDark;
 
-  const EventItemScreen({super.key, required this.eventModel});
+  EventItemScreen({super.key, required this.eventModel});
 
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
+    isDark = Provider.of<SettingsProvider>(context).isDark;
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -126,13 +131,18 @@ class EventItemScreen extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: isDark
+            ? AppTheme.backgroundDark
+            : AppTheme.backgroundWhite,
         title: Text(
           'Delete Event',
           style: textTheme.titleLarge!.copyWith(color: AppTheme.primary),
         ),
         content: Text(
           'Are you sure you want to delete this event?',
-          style: textTheme.titleLarge!.copyWith(color: AppTheme.black),
+          style: textTheme.titleMedium!.copyWith(
+            color: isDark ? AppTheme.backgroundWhite : AppTheme.black,
+          ),
         ),
         actions: [
           TextButton(

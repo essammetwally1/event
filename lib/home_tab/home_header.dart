@@ -2,6 +2,7 @@ import 'package:event/app_theme.dart';
 import 'package:event/home_tab/tab_item.dart';
 import 'package:event/models/category_model.dart';
 import 'package:event/provider/event_provider.dart';
+import 'package:event/provider/settings_provider.dart';
 import 'package:event/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -16,13 +17,15 @@ class HomeHeader extends StatefulWidget {
 
 class _HomeHeaderState extends State<HomeHeader> {
   int currentIndex = 0;
+  late bool isDark;
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
+    isDark = Provider.of<SettingsProvider>(context).isDark;
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
-        color: AppTheme.primary,
+        color: isDark ? AppTheme.backgroundDark : AppTheme.primary,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(24),
@@ -43,7 +46,8 @@ class _HomeHeaderState extends State<HomeHeader> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SvgPicture.asset('assets/icons/locationActive.svg'),
+                SvgPicture.asset('assets/icons/location.svg'),
+                SizedBox(width: 10),
                 Text('Cairo , Egypt', style: textTheme.titleSmall),
               ],
             ),
@@ -57,7 +61,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                 dividerColor: Colors.transparent,
                 indicatorColor: Colors.transparent,
                 isScrollable: true,
-                labelPadding: EdgeInsets.only(right: 10),
+                labelPadding: EdgeInsetsDirectional.only(end: 10),
                 onTap: (index) {
                   if (currentIndex == index) return;
 
@@ -76,9 +80,15 @@ class _HomeHeaderState extends State<HomeHeader> {
                     label: 'All',
                     icon: Icons.safety_check,
                     isSelected: currentIndex == 0,
-                    selectedBackgroundColor: AppTheme.backgroundWhite,
-                    unSelectedBackgroundColor: AppTheme.primary,
-                    foreginSelectedColor: AppTheme.primary,
+                    selectedBackgroundColor: isDark
+                        ? AppTheme.primary
+                        : AppTheme.backgroundWhite,
+                    unSelectedBackgroundColor: isDark
+                        ? AppTheme.backgroundDark
+                        : AppTheme.primary,
+                    foreginSelectedColor: isDark
+                        ? AppTheme.backgroundWhite
+                        : AppTheme.primary,
                     foreginUnSelectedColor: AppTheme.backgroundWhite,
                   ),
                   ...CategoryModel.categoryList.map(
@@ -88,9 +98,15 @@ class _HomeHeaderState extends State<HomeHeader> {
                       isSelected:
                           currentIndex ==
                           CategoryModel.categoryList.indexOf(category) + 1,
-                      selectedBackgroundColor: AppTheme.backgroundWhite,
-                      unSelectedBackgroundColor: AppTheme.primary,
-                      foreginSelectedColor: AppTheme.primary,
+                      selectedBackgroundColor: isDark
+                          ? AppTheme.primary
+                          : AppTheme.backgroundWhite,
+                      unSelectedBackgroundColor: isDark
+                          ? AppTheme.backgroundDark
+                          : AppTheme.primary,
+                      foreginSelectedColor: isDark
+                          ? AppTheme.backgroundWhite
+                          : AppTheme.primary,
                       foreginUnSelectedColor: AppTheme.backgroundWhite,
                     ),
                   ),

@@ -1,6 +1,7 @@
 import 'package:event/app_theme.dart';
 import 'package:event/models/event_model.dart';
 import 'package:event/provider/event_provider.dart';
+import 'package:event/provider/settings_provider.dart';
 import 'package:event/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -16,9 +17,11 @@ class EventItem extends StatefulWidget {
 
 class _EventItemState extends State<EventItem> {
   late bool isLoved;
+  late bool isDark;
 
   @override
   Widget build(BuildContext context) {
+    isDark = Provider.of<SettingsProvider>(context).isDark;
     UserProvider userProvider = Provider.of<UserProvider>(context);
     isLoved = userProvider.isFavourite(widget.event.id);
     Size screenSize = MediaQuery.sizeOf(context);
@@ -31,7 +34,7 @@ class _EventItemState extends State<EventItem> {
             borderRadius: BorderRadius.circular(16),
             child: Image.asset(
               'assets/categoreis/${widget.event.categoryModel.imageName}.png',
-              height: screenSize.height * .25,
+              height: screenSize.height * .35,
               width: screenSize.width,
               fit: BoxFit.fill,
             ),
@@ -40,7 +43,9 @@ class _EventItemState extends State<EventItem> {
             padding: EdgeInsets.all(8),
             margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppTheme.backgroundWhite,
+              color: isDark
+                  ? AppTheme.backgroundDark
+                  : AppTheme.backgroundWhite,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(
@@ -69,7 +74,9 @@ class _EventItemState extends State<EventItem> {
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppTheme.backgroundWhite,
+                color: isDark
+                    ? AppTheme.backgroundDark
+                    : AppTheme.backgroundWhite,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -82,7 +89,6 @@ class _EventItemState extends State<EventItem> {
                           widget.event.title,
                           style: textTheme.titleMedium!.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AppTheme.black,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -92,7 +98,6 @@ class _EventItemState extends State<EventItem> {
                           widget.event.description,
                           style: textTheme.titleSmall!.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AppTheme.black,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

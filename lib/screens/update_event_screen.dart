@@ -6,10 +6,12 @@ import 'package:event/firebase/firebase_service.dart';
 import 'package:event/home_tab/tab_item.dart';
 import 'package:event/models/category_model.dart';
 import 'package:event/models/event_model.dart';
+import 'package:event/provider/settings_provider.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:event/utilis.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class UpdateEventScreen extends StatefulWidget {
   final EventModel? eventModel;
@@ -27,6 +29,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
   TimeOfDay? selectedTime;
   bool isLoading = false;
   GlobalKey<FormState> globalKey = GlobalKey<FormState>();
+  late bool isDark;
 
   @override
   void initState() {
@@ -43,6 +46,8 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
 
   @override
   Widget build(BuildContext context) {
+    isDark = Provider.of<SettingsProvider>(context).isDark;
+
     TextTheme textTheme = Theme.of(context).textTheme;
     return Scaffold(
       appBar: AppBar(title: Text('Update Event')),
@@ -86,10 +91,18 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
                         isSelected:
                             currentIndex ==
                             CategoryModel.categoryList.indexOf(category),
-                        selectedBackgroundColor: AppTheme.primary,
-                        unSelectedBackgroundColor: AppTheme.backgroundWhite,
-                        foreginSelectedColor: AppTheme.backgroundWhite,
-                        foreginUnSelectedColor: AppTheme.primary,
+                        selectedBackgroundColor: isDark
+                            ? AppTheme.primary
+                            : AppTheme.backgroundWhite,
+                        unSelectedBackgroundColor: isDark
+                            ? AppTheme.backgroundDark
+                            : AppTheme.primary,
+                        foreginSelectedColor: isDark
+                            ? AppTheme.black
+                            : AppTheme.primary,
+                        foreginUnSelectedColor: isDark
+                            ? AppTheme.primary
+                            : AppTheme.backgroundWhite,
                       ),
                     )
                     .toList(),

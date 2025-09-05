@@ -36,7 +36,7 @@ class AppTheme {
       selectedItemColor: backgroundWhite,
       unselectedItemColor: backgroundWhite,
     ),
-    bottomAppBarTheme: BottomAppBarTheme(color: primary, elevation: 0),
+    bottomAppBarTheme: BottomAppBarThemeData(color: primary, elevation: 0),
     inputDecorationTheme: InputDecorationTheme(
       contentPadding: EdgeInsets.all(12),
 
@@ -102,5 +102,100 @@ class AppTheme {
       ),
     ),
   );
-  static ThemeData dartTheme = ThemeData();
+  static ThemeData dartTheme = ThemeData(
+    appBarTheme: AppBarTheme(
+      backgroundColor: backgroundDark,
+      foregroundColor: primary,
+      centerTitle: true,
+      titleTextStyle: TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 22,
+        color: primary,
+      ),
+      iconTheme: IconThemeData(size: 30, color: primary),
+    ),
+    scaffoldBackgroundColor: backgroundDark,
+    splashColor: Colors.transparent,
+    highlightColor: Colors.transparent,
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: backgroundDark,
+      foregroundColor: backgroundWhite,
+      shape: CircleBorder(),
+    ),
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      elevation: 0,
+      backgroundColor: backgroundDark,
+      type: BottomNavigationBarType.fixed,
+      selectedItemColor: backgroundWhite,
+      unselectedItemColor: backgroundWhite,
+    ),
+    bottomAppBarTheme: BottomAppBarThemeData(
+      color: backgroundDark,
+      elevation: 0,
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      contentPadding: EdgeInsets.all(12),
+
+      hintStyle: TextStyle(
+        fontSize: 16,
+        color: backgroundWhite,
+        fontWeight: FontWeight.w500,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: primary),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: primary),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: red),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: red),
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: primary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+    ),
+    textTheme: TextTheme(
+      headlineSmall: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: backgroundWhite,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w500,
+        color: backgroundWhite,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: backgroundWhite,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: backgroundWhite,
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: primary,
+        textStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          fontStyle: FontStyle.italic,
+          decoration: TextDecoration.underline,
+        ),
+      ),
+    ),
+  );
 }
