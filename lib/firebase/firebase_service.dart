@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event/models/event_model.dart';
 import 'package:event/models/user_model.dart';
@@ -12,6 +14,7 @@ class FirebaseService {
                 EventModel.fromJson(docSnapshot.data()!),
             toFirestore: (event, _) => event.toJson(),
           );
+
   static CollectionReference<UserModel> getUsersCollection() =>
       FirebaseFirestore.instance
           .collection('users')
@@ -58,34 +61,65 @@ class FirebaseService {
     required String password,
     required String email,
   }) async {
-    UserCredential userCredential = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email, password: password);
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
 
-    UserModel userModel = UserModel(
-      id: userCredential.user!.uid,
-      name: name,
-      email: email,
-      favouriteEventsIds: [],
-    );
+      UserModel userModel = UserModel(
+        id: userCredential.user!.uid,
+        name: name,
+        email: email,
+        favouriteEventsIds: [],
+      );
 
-    CollectionReference<UserModel> usersCollection = getUsersCollection();
-    await usersCollection.doc(userModel.id).set(userModel);
+      CollectionReference<UserModel> usersCollection = getUsersCollection();
+      await usersCollection.doc(userModel.id).set(userModel);
 
-    return userModel;
+      return userModel;
+    } catch (e) {
+      log('Firebase registration error: $e');
+      rethrow; // Re-throw the error to handle it in the UI
+    }
   }
 
   static Future<UserModel> logIn({
     required String email,
     required String password,
   }) async {
-    UserCredential userCredential = await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: password);
-    CollectionReference<UserModel> usersColletion = getUsersCollection();
-    DocumentSnapshot<UserModel> docSnapshot = await usersColletion
-        .doc(userCredential.user!.uid)
-        .get();
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
 
-    return docSnapshot.data()!;
+      final String userId = userCredential.user!.uid;
+
+      CollectionReference<UserModel> usersCollection = getUsersCollection();
+      DocumentSnapshot<UserModel> docSnapshot = await usersCollection
+          .doc(userId)
+          .get();
+
+      if (docSnapshot.exists && docSnapshot.data() != null) {
+        return docSnapshot.data()!;
+      } else {
+        final UserModel newUser = UserModel(
+          id: userId,
+          name: userCredential.user!.displayName ?? 'User',
+          email: email,
+          favouriteEventsIds: [],
+        );
+
+        await usersCollection.doc(userId).set(newUser);
+        return newUser;
+      }
+    } on FirebaseAuthException catch (e) {
+      log('Firebase Auth Error: ${e.code} - ${e.message}');
+      rethrow;
+    } on FirebaseException catch (e) {
+      log('Firestore Error: ${e.code} - ${e.message}');
+      throw Exception('Failed to access user data. Please try again.');
+    } catch (e) {
+      log('Unexpected error during login: $e');
+      throw Exception('An unexpected error occurred. Please try again.');
+    }
   }
 
   static Future<void> signOut() => FirebaseAuth.instance.signOut();

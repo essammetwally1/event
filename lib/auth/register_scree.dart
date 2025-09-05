@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:event/app_theme.dart';
 import 'package:event/auth/login_screen.dart';
 import 'package:event/components/custom_elevated_button.dart';
@@ -74,11 +76,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Enter Email';
-                    } else if (!value.contains('@gmail.com')) {
-                      return 'Enter Valid Email';
-                    } else {
-                      return null;
+                    } else if (!RegExp(
+                      r'^[^@]+@[^@]+\.[^@]+',
+                    ).hasMatch(value)) {
+                      return 'Enter a valid email address';
                     }
+                    return null;
                   },
                 ),
                 SizedBox(height: 16),
@@ -136,33 +139,62 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  void register() {
+  Future<void> register() async {
     if (globalKey.currentState!.validate()) {
-      if (isLoading == false) {
-        isLoading = true;
-        setState(() {});
-      }
-      FirebaseService.register(
-            name: nameController.text,
-            password: passwordController.text,
-            email: emailController.text,
-          )
-          .then((user) {
-            Provider.of<UserProvider>(
-              context,
-              listen: false,
-            ).updateCurrentUser(user);
+      if (isLoading) return; // Prevent multiple clicks
 
-            Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
-            Utils.showSuccessMessage('Register Succes');
-          })
-          .catchError((error) {
-            String? message;
-            if (error is FirebaseException) {
-              message = error.message;
-            }
-            Utils.showErrorMessage(message);
+      setState(() {
+        isLoading = true;
+      });
+
+      try {
+        final user = await FirebaseService.register(
+          name: nameController.text.trim(),
+          password: passwordController.text.trim(),
+          email: emailController.text.trim(),
+        );
+
+        Provider.of<UserProvider>(
+          context,
+          listen: false,
+        ).updateCurrentUser(user);
+
+        Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+        Utils.showSuccessMessage('Register Success');
+      } catch (error) {
+        log('Registration error: $error');
+
+        String errorMessage = 'Registration failed. Please try again.';
+
+        if (error is FirebaseAuthException) {
+          switch (error.code) {
+            case 'email-already-in-use':
+              errorMessage = 'This email is already registered.';
+              break;
+            case 'invalid-email':
+              errorMessage = 'Please enter a valid email address.';
+              break;
+            case 'operation-not-allowed':
+              errorMessage = 'Email/password accounts are not enabled.';
+              break;
+            case 'weak-password':
+              errorMessage = 'Password is too weak.';
+              break;
+            default:
+              errorMessage = error.message ?? 'Registration failed.';
+          }
+        } else if (error is FirebaseException) {
+          errorMessage = error.message ?? 'Firebase error occurred.';
+        }
+
+        Utils.showErrorMessage(errorMessage);
+      } finally {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
           });
+        }
+      }
     }
   }
 }

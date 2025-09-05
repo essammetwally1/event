@@ -8,6 +8,7 @@ import 'package:event/provider/settings_provider.dart';
 import 'package:event/provider/user_provider.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:event/utilis.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,6 +26,13 @@ class _LoginScreenState extends State<LoginScreen> {
   GlobalKey<FormState> globalKey = GlobalKey<FormState>();
   late bool isDark;
   bool isLoading = false;
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,24 +54,25 @@ class _LoginScreenState extends State<LoginScreen> {
             key: globalKey,
             child: Column(
               children: [
-                SizedBox(height: 50),
+                const SizedBox(height: 50),
                 Image.asset('assets/Logo.png'),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 CustomTextFormField(
-                  hintText: 'Mail',
+                  hintText: 'Email',
                   iconPathName: 'mail',
                   controller: emailController,
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Enter Email';
-                    } else if (!value.contains('@gmail.com')) {
-                      return 'Enter Valid Email';
-                    } else {
-                      return null;
+                    } else if (!RegExp(
+                      r'^[^@]+@[^@]+\.[^@]+',
+                    ).hasMatch(value)) {
+                      return 'Enter a valid email address';
                     }
+                    return null;
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 CustomTextFormField(
                   hintText: 'Password',
                   iconPathName: 'password',
@@ -72,26 +81,25 @@ class _LoginScreenState extends State<LoginScreen> {
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Enter password';
-                    } else if (value.length < 9) {
-                      return 'Enter valid password -more than 9 letters-';
-                    } else {
-                      return null;
+                    } else if (value.length < 6) {
+                      return 'Password must be at least 6 characters';
                     }
+                    return null;
                   },
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
 
                 CustomElevatedButton(
                   isLoading: isLoading,
                   onPressed: login,
                   textElevatedButton: 'Login',
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Don’t Have Account ?',
+                      'Don\'t Have Account?',
                       style: isDark
                           ? Theme.of(context).textTheme.titleMedium!.copyWith(
                               color: AppTheme.backgroundWhite,
@@ -103,10 +111,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                     ),
                     TextButton(
-                      onPressed: () => Navigator.of(
-                        context,
-                      ).pushReplacementNamed(RegisterScreen.routeName),
-                      child: Text('Create Account'),
+                      onPressed: isLoading
+                          ? null
+                          : () => Navigator.of(
+                              context,
+                            ).pushReplacementNamed(RegisterScreen.routeName),
+                      child: const Text('Create Account'),
                     ),
                   ],
                 ),
@@ -143,32 +153,59 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void login() {
+  Future<void> login() async {
     if (globalKey.currentState!.validate()) {
-      if (isLoading == false) {
-        isLoading = true;
-        setState(() {});
-      }
-      FirebaseService.logIn(
-            email: emailController.text,
-            password: passwordController.text,
-          )
-          .then((user) {
-            Provider.of<UserProvider>(
-              context,
-              listen: false,
-            ).updateCurrentUser(user);
-            Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+      if (isLoading) return;
 
-            Utils.showSuccessMessage('Login Success');
-          })
-          .catchError((error) {
-            String? message;
-            if (error is FirebaseException) {
-              message = error.message;
-            }
-            Utils.showErrorMessage(message);
+      setState(() {
+        isLoading = true;
+      });
+
+      try {
+        final user = await FirebaseService.logIn(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        );
+
+        Provider.of<UserProvider>(
+          context,
+          listen: false,
+        ).updateCurrentUser(user);
+
+        Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+        Utils.showSuccessMessage('Login Success');
+      } catch (error) {
+        String errorMessage = 'Login failed. Please try again.';
+
+        if (error is FirebaseAuthException) {
+          switch (error.code) {
+            case 'user-not-found':
+              errorMessage = 'No user found with this email.';
+              break;
+            case 'wrong-password':
+              errorMessage = 'Incorrect password. Please try again.';
+              break;
+            case 'invalid-email':
+              errorMessage = 'Please enter a valid email address.';
+              break;
+            case 'user-disabled':
+              errorMessage = 'This account has been disabled.';
+              break;
+            default:
+              errorMessage = error.message ?? 'Login failed.';
+          }
+        } else if (error is FirebaseException) {
+          errorMessage = error.message ?? 'Firebase error occurred.';
+        }
+
+        Utils.showErrorMessage(errorMessage);
+      } finally {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
           });
+        }
+      }
     }
   }
 }
