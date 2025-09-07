@@ -12,7 +12,7 @@ class ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     UserModel? userModel = Provider.of<UserProvider>(context).currentUser;
     return Container(
-      padding: EdgeInsets.only(bottom: 16, left: 16, right: 16),
+      padding: EdgeInsets.only(bottom: 16, left: 20, right: 16, top: 20),
       decoration: BoxDecoration(
         color: AppTheme.primary,
         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(64)),
@@ -20,12 +20,12 @@ class ProfileHeader extends StatelessWidget {
       child: SafeArea(
         child: Row(
           children: [
-            Image.asset(
-              'assets/routeLogo.png',
-              height: 124,
-              width: 124,
-              fit: BoxFit.fill,
-            ),
+            // Image.asset(
+            //   'assets/routeLogo.png',
+            //   height: 124,
+            //   width: 124,
+            //   fit: BoxFit.fill,
+            // ),
             SizedBox(width: 16),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

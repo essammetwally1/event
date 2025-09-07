@@ -46,7 +46,7 @@ class FirebaseService {
     try {
       eventsCollection.doc(eventId).delete().then((_) => true);
     } catch (e) {
-      print(e.toString());
+      log(e.toString());
     }
     return false;
   }

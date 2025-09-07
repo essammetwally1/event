@@ -98,6 +98,9 @@ class _EventItemState extends State<EventItem> {
                           widget.event.description,
                           style: textTheme.titleSmall!.copyWith(
                             fontWeight: FontWeight.bold,
+                            color: isDark
+                                ? AppTheme.backgroundWhite
+                                : AppTheme.primary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

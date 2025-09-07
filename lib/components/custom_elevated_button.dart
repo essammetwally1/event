@@ -5,17 +5,22 @@ class CustomElevatedButton extends StatelessWidget {
   final String textElevatedButton;
   final VoidCallback onPressed;
   final bool isLoading;
+  final Color color;
+  final TextStyle? textStyle;
   const CustomElevatedButton({
     super.key,
     required this.textElevatedButton,
     required this.onPressed,
     this.isLoading = false,
+    this.color = AppTheme.primary,
+    this.textStyle,
   });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
+        backgroundColor: color,
         fixedSize: Size(MediaQuery.sizeOf(context).width, 56),
       ),
       onPressed: onPressed,
@@ -23,7 +28,30 @@ class CustomElevatedButton extends StatelessWidget {
           ? Center(
               child: CircularProgressIndicator(color: AppTheme.backgroundWhite),
             )
-          : Text(textElevatedButton, style: TextTheme.of(context).titleLarge),
+          : textElevatedButton == 'Login With Google'
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'G',
+                  style:
+                      textStyle ??
+                      TextTheme.of(context).titleLarge!.copyWith(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                SizedBox(width: 10),
+                Text(
+                  textElevatedButton,
+                  style: textStyle ?? TextTheme.of(context).titleLarge,
+                ),
+              ],
+            )
+          : Text(
+              textElevatedButton,
+              style: textStyle ?? TextTheme.of(context).titleLarge,
+            ),
     );
   }
 }

@@ -81,10 +81,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Enter password';
-                    } else if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                    } else if (value.length < 9) {
+                      return 'Password should be -more than 9 letters-';
+                    } else {
+                      return null;
                     }
-                    return null;
                   },
                 ),
                 const SizedBox(height: 24),
@@ -144,6 +145,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ],
+                ),
+                SizedBox(height: 16),
+                CustomElevatedButton(
+                  textElevatedButton: 'Login With Google',
+                  onPressed: () {},
                 ),
               ],
             ),

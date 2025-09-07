@@ -6,6 +6,7 @@ import 'package:event/firebase/firebase_service.dart';
 import 'package:event/home_tab/tab_item.dart';
 import 'package:event/models/category_model.dart';
 import 'package:event/models/event_model.dart';
+import 'package:event/provider/event_provider.dart';
 import 'package:event/provider/settings_provider.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:event/utilis.dart';
@@ -47,6 +48,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
   @override
   Widget build(BuildContext context) {
     isDark = Provider.of<SettingsProvider>(context).isDark;
+    EventProvider eventProvider = Provider.of<EventProvider>(context);
 
     TextTheme textTheme = Theme.of(context).textTheme;
     return Scaffold(
@@ -232,6 +234,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
         );
         FirebaseService.updateEvent(eventModel)
             .then((_) {
+              Provider.of<EventProvider>(context).getEvents();
               Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
               Utils.showSuccessMessage('Event Updated');
             })

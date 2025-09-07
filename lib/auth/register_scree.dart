@@ -34,7 +34,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     isDark = Provider.of<SettingsProvider>(context).isDark;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         centerTitle: true,
         title: Text(
@@ -159,7 +158,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           listen: false,
         ).updateCurrentUser(user);
 
-        Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+        Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
         Utils.showSuccessMessage('Register Success');
       } catch (error) {
         log('Registration error: $error');
