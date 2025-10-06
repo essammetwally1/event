@@ -2,6 +2,7 @@ import 'package:event/app_theme.dart';
 import 'package:event/components/action_icon_button.dart';
 import 'package:event/firebase/firebase_service.dart';
 import 'package:event/models/event_model.dart';
+import 'package:event/provider/event_provider.dart';
 import 'package:event/provider/settings_provider.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:event/screens/update_event_screen.dart';
@@ -15,37 +16,38 @@ import 'package:provider/provider.dart';
 class EventItemScreen extends StatelessWidget {
   static const String routeName = '/eventitemscreen';
   final EventModel eventModel;
-  late bool isDark;
 
-  EventItemScreen({super.key, required this.eventModel});
+  const EventItemScreen({super.key, required this.eventModel});
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    isDark = Provider.of<SettingsProvider>(context).isDark;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          ActionIconButton(
-            iconPath: 'edit',
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) {
-                    return UpdateEventScreen(eventModel: eventModel);
+        actions: FirebaseAuth.instance.currentUser?.uid == eventModel.userId
+            ? [
+                ActionIconButton(
+                  iconPath: 'edit',
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return UpdateEventScreen(eventModel: eventModel);
+                        },
+                      ),
+                    );
                   },
                 ),
-              );
-            },
-          ),
-          ActionIconButton(
-            iconPath: 'delete',
-            onPressed: () {
-              deleteEvent(eventModel.id, textTheme, context);
-            },
-          ),
-        ],
+                ActionIconButton(
+                  iconPath: 'delete',
+                  onPressed: () {
+                    deleteEvent(eventModel.id, textTheme, context);
+                  },
+                ),
+              ]
+            : [],
+
         title: Text('Event Details'),
       ),
       body: Padding(
@@ -131,7 +133,7 @@ class EventItemScreen extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: isDark
+        backgroundColor: Provider.of<SettingsProvider>(context).isDark
             ? AppTheme.backgroundDark
             : AppTheme.backgroundWhite,
         title: Text(
@@ -141,7 +143,9 @@ class EventItemScreen extends StatelessWidget {
         content: Text(
           'Are you sure you want to delete this event?',
           style: textTheme.titleMedium!.copyWith(
-            color: isDark ? AppTheme.backgroundWhite : AppTheme.black,
+            color: Provider.of<SettingsProvider>(context).isDark
+                ? AppTheme.backgroundWhite
+                : AppTheme.black,
           ),
         ),
         actions: [
@@ -153,7 +157,11 @@ class EventItemScreen extends StatelessWidget {
             ),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () {
+              Provider.of<EventProvider>(context, listen: false).getEvents();
+
+              Navigator.pop(context, true);
+            },
             child: Text(
               'Delete',
               style: textTheme.titleMedium!.copyWith(color: AppTheme.red),

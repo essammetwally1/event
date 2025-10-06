@@ -48,7 +48,6 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
   @override
   Widget build(BuildContext context) {
     isDark = Provider.of<SettingsProvider>(context).isDark;
-    EventProvider eventProvider = Provider.of<EventProvider>(context);
 
     TextTheme textTheme = Theme.of(context).textTheme;
     return Scaffold(
@@ -234,7 +233,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
         );
         FirebaseService.updateEvent(eventModel)
             .then((_) {
-              Provider.of<EventProvider>(context).getEvents();
+              Provider.of<EventProvider>(context, listen: false).getEvents();
               Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
               Utils.showSuccessMessage('Event Updated');
             })

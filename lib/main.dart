@@ -1,6 +1,6 @@
 import 'package:event/app_theme.dart';
 import 'package:event/auth/login_screen.dart';
-import 'package:event/auth/register_scree.dart';
+import 'package:event/auth/register_screen.dart';
 import 'package:event/provider/event_provider.dart';
 import 'package:event/provider/settings_provider.dart';
 import 'package:event/provider/user_provider.dart';
@@ -33,7 +33,7 @@ class EventApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: OnboardingScreen.routeName,
+      initialRoute: LoginScreen.routeName,
       routes: {
         HomeScreen.routeName: (context) => HomeScreen(),
         LoginScreen.routeName: (context) => LoginScreen(),

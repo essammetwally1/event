@@ -7,7 +7,6 @@ import 'package:event/components/custom_textfield.dart';
 import 'package:event/firebase/firebase_service.dart';
 import 'package:event/provider/settings_provider.dart';
 import 'package:event/provider/user_provider.dart';
-import 'package:event/screens/home_screen.dart';
 import 'package:event/utilis.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
