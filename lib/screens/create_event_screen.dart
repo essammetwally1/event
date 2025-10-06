@@ -14,6 +14,7 @@ import 'package:event/utilis.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -36,6 +37,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   GlobalKey<FormState> globalKey = GlobalKey<FormState>();
   LatLng? _pickedLatLng;
   String? _pickedAddress;
+  bool _isGettingLocation = true;
 
   late bool isDark;
 
@@ -45,12 +47,84 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     widget.eventModel != null
         ? currentIndex = int.parse(widget.eventModel!.categoryModel.id) - 1
         : 0;
+
+    // Initialize with device location
+    _getDeviceLatLng();
+  }
+
+  Future<void> _getDeviceLatLng() async {
+    try {
+      setState(() {
+        _isGettingLocation = true;
+      });
+
+      // Check if location service is enabled
+      final enabled = await Geolocator.isLocationServiceEnabled();
+      if (!enabled) {
+        if (mounted) {
+          setState(() {
+            _isGettingLocation = false;
+            _pickedAddress = 'Location services disabled';
+          });
+        }
+        return;
+      }
+
+      // Check location permission
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          if (mounted) {
+            setState(() {
+              _isGettingLocation = false;
+              _pickedAddress = 'Location permission denied';
+            });
+          }
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          setState(() {
+            _isGettingLocation = false;
+            _pickedAddress = 'Location permission permanently denied';
+          });
+        }
+        return;
+      }
+
+      // Get current position
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: LocationSettings(accuracy: LocationAccuracy.best),
+      );
+
+      if (mounted) {
+        setState(() {
+          _pickedLatLng = LatLng(position.latitude, position.longitude);
+          _pickedAddress =
+              '${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}';
+          _isGettingLocation = false;
+        });
+      }
+    } catch (e) {
+      print("Error getting location: $e");
+      if (mounted) {
+        setState(() {
+          _isGettingLocation = false;
+          _pickedAddress = 'Error getting location';
+          // Set default location as fallback
+          _pickedLatLng = const LatLng(30.0444, 31.2357);
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    isDark = Provider.of<SettingsProvider>(context).isDark;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final bool isDark = Provider.of<SettingsProvider>(context).isDark;
     return Scaffold(
       appBar: AppBar(
         title: Text('Create Event'),
@@ -188,21 +262,24 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         setState(() {});
                       },
                     ),
+
+                    // Location Picker Section
                     InkWell(
                       onTap: () async {
-                        // Choose a sensible default (e.g. Cairo)
+                        // Use the current picked location or device location as initial
                         final initial =
                             _pickedLatLng ?? const LatLng(30.0444, 31.2357);
 
-                        // Push the picker screen and wait for result
                         final result = await Navigator.push<LatLng>(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => MapPickerScreen(initial: initial),
+                            builder: (_) => MapPickerScreen(
+                              initial: initial,
+                              isSelected: false,
+                            ),
                           ),
                         );
 
-                        // If user picked something, update UI
                         if (result != null) {
                           setState(() {
                             _pickedLatLng = result;
@@ -211,7 +288,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           });
                         }
                       },
-
                       child: Container(
                         padding: EdgeInsets.all(8),
                         margin: EdgeInsets.only(top: 5, bottom: 16),
@@ -232,12 +308,45 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                               ),
                             ),
                             SizedBox(width: 8),
-                            Text(
-                              _pickedAddress ?? 'Cairo , Egypt',
-                              style: textTheme.titleMedium,
-                              overflow: TextOverflow.ellipsis,
+                            Expanded(
+                              child: _isGettingLocation
+                                  ? Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: AppTheme.primary,
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Getting your location...',
+                                          style: textTheme.titleMedium,
+                                        ),
+                                      ],
+                                    )
+                                  : Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Tap to select other location',
+                                          style: textTheme.titleMedium,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          _pickedAddress!,
+                                          style: textTheme.titleSmall!.copyWith(
+                                            color: AppTheme.primary,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
                             ),
-                            Spacer(),
                             Icon(
                               Icons.arrow_forward_ios,
                               color: AppTheme.primary,
@@ -246,7 +355,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         ),
                       ),
                     ),
-
                     CustomElevatedButton(
                       isLoading: isLoading,
 
@@ -265,16 +373,20 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   void addEvent() {
     if (globalKey.currentState!.validate()) {
-      if (selectedDate == null && selectedTime == null) {
+      if (selectedDate == null || selectedTime == null) {
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
             backgroundColor: AppTheme.backgroundWhite,
             title: Text(
-              'Selected Time & Date',
+              'Select Time & Date',
               style: Theme.of(
                 context,
               ).textTheme.titleLarge!.copyWith(color: AppTheme.primary),
+            ),
+            content: Text(
+              'Please select both date and time for your event.',
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             actions: [
               TextButton(
@@ -285,39 +397,76 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             ],
           ),
         );
-      } else {
-        if (isLoading == false) {
-          isLoading = true;
-          setState(() {});
-        }
-        DateTime dateTime = DateTime(
-          selectedDate!.year,
-          selectedDate!.month,
-          selectedDate!.day,
-          selectedTime!.hour,
-          selectedTime!.minute,
-        );
-        EventModel eventModel = EventModel(
-          userId: FirebaseAuth.instance.currentUser!.uid,
-          title: titleController!.text,
-          description: descriptionController!.text,
-          categoryModel: CategoryModel.categoryList[currentIndex],
-          dateTime: dateTime,
-        );
-        FirebaseService.createEvent(eventModel)
-            .then((_) {
-              Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
-              Utils.showSuccessMessage('Evenet Created');
-              Provider.of<EventProvider>(context, listen: false).getEvents();
-            })
-            .catchError((error) {
-              String? message;
-              if (error is FirebaseException) {
-                message = error.message;
-              }
-              Utils.showErrorMessage(message);
-            });
+        return;
       }
+
+      if (_pickedLatLng == null) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            backgroundColor: AppTheme.backgroundWhite,
+            title: Text(
+              'Select Location',
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge!.copyWith(color: AppTheme.primary),
+            ),
+            content: Text(
+              'Please select a location for your event.',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            actions: [
+              TextButton(
+                style: TextButton.styleFrom(),
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
+      if (isLoading == false) {
+        setState(() {
+          isLoading = true;
+        });
+      }
+
+      DateTime dateTime = DateTime(
+        selectedDate!.year,
+        selectedDate!.month,
+        selectedDate!.day,
+        selectedTime!.hour,
+        selectedTime!.minute,
+      );
+
+      EventModel eventModel = EventModel(
+        userId: FirebaseAuth.instance.currentUser!.uid,
+        title: titleController!.text,
+        description: descriptionController!.text,
+        categoryModel: CategoryModel.categoryList[currentIndex],
+        dateTime: dateTime,
+        location: _pickedLatLng!, // Add location
+        address: _pickedAddress, // Add address
+      );
+
+      FirebaseService.createEvent(eventModel)
+          .then((_) {
+            Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+            Utils.showSuccessMessage('Event Created Successfully');
+            Provider.of<EventProvider>(context, listen: false).getEvents();
+          })
+          .catchError((error) {
+            setState(() {
+              isLoading = false;
+            });
+            String? message;
+            if (error is FirebaseException) {
+              message = error.message;
+            }
+            Utils.showErrorMessage(message ?? 'Failed to create event');
+          });
     }
   }
 }
