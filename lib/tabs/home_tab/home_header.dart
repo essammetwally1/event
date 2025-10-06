@@ -1,5 +1,5 @@
 import 'package:event/app_theme.dart';
-import 'package:event/home_tab/tab_item.dart';
+import 'package:event/tabs/home_tab/tab_item.dart';
 import 'package:event/models/category_model.dart';
 import 'package:event/provider/event_provider.dart';
 import 'package:event/provider/settings_provider.dart';

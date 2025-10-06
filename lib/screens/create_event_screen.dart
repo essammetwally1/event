@@ -3,7 +3,8 @@ import 'package:event/components/custom_create_eventrow.dart';
 import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/components/custom_textfield.dart';
 import 'package:event/firebase/firebase_service.dart';
-import 'package:event/home_tab/tab_item.dart';
+import 'package:event/screens/map_pikcer_screen.dart';
+import 'package:event/tabs/home_tab/tab_item.dart';
 import 'package:event/models/category_model.dart';
 import 'package:event/models/event_model.dart';
 import 'package:event/provider/event_provider.dart';
@@ -12,7 +13,9 @@ import 'package:event/screens/home_screen.dart';
 import 'package:event/utilis.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class CreateEventScreen extends StatefulWidget {
   static const String routeName = '/createevent';
@@ -31,6 +34,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   TimeOfDay? selectedTime;
   bool isLoading = false;
   GlobalKey<FormState> globalKey = GlobalKey<FormState>();
+  LatLng? _pickedLatLng;
+  String? _pickedAddress;
+
   late bool isDark;
 
   @override
@@ -181,6 +187,64 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         );
                         setState(() {});
                       },
+                    ),
+                    InkWell(
+                      onTap: () async {
+                        // Choose a sensible default (e.g. Cairo)
+                        final initial =
+                            _pickedLatLng ?? const LatLng(30.0444, 31.2357);
+
+                        // Push the picker screen and wait for result
+                        final result = await Navigator.push<LatLng>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => MapPickerScreen(initial: initial),
+                          ),
+                        );
+
+                        // If user picked something, update UI
+                        if (result != null) {
+                          setState(() {
+                            _pickedLatLng = result;
+                            _pickedAddress =
+                                '${result.latitude.toStringAsFixed(4)}, ${result.longitude.toStringAsFixed(4)}';
+                          });
+                        }
+                      },
+
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        margin: EdgeInsets.only(top: 5, bottom: 16),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppTheme.primary, width: 2),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: AppTheme.primary,
+                              ),
+                              child: SvgPicture.asset(
+                                'assets/icons/pickLocation.svg',
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              _pickedAddress ?? 'Cairo , Egypt',
+                              style: textTheme.titleMedium,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Spacer(),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              color: AppTheme.primary,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
 
                     CustomElevatedButton(

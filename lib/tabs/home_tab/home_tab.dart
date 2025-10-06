@@ -1,5 +1,5 @@
 import 'package:event/components/event_item.dart';
-import 'package:event/home_tab/home_header.dart';
+import 'package:event/tabs/home_tab/home_header.dart';
 import 'package:event/provider/event_provider.dart';
 import 'package:event/screens/event_item_screen.dart';
 import 'package:flutter/material.dart';
