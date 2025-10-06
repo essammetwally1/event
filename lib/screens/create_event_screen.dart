@@ -39,7 +39,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   String? _pickedAddress;
   bool _isGettingLocation = true;
 
-  late bool isDark;
+  // late bool isDark;
 
   @override
   void initState() {
@@ -59,7 +59,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       });
 
       // Check if location service is enabled
-      final enabled = await Geolocator.isLocationServiceEnabled();
+      final bool enabled = await Geolocator.isLocationServiceEnabled();
       if (!enabled) {
         if (mounted) {
           setState(() {
@@ -96,7 +96,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       }
 
       // Get current position
-      final position = await Geolocator.getCurrentPosition(
+      final Position position = await Geolocator.getCurrentPosition(
         locationSettings: LocationSettings(accuracy: LocationAccuracy.best),
       );
 
@@ -267,7 +267,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     InkWell(
                       onTap: () async {
                         // Use the current picked location or device location as initial
-                        final initial =
+                        final LatLng initial =
                             _pickedLatLng ?? const LatLng(30.0444, 31.2357);
 
                         final result = await Navigator.push<LatLng>(
@@ -359,7 +359,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       isLoading: isLoading,
 
                       textElevatedButton: 'Add Event',
-                      onPressed: addEvent,
+                      onPressed: () {
+                        addEvent(isDark: isDark);
+                      },
                     ),
                   ],
                 ),
@@ -371,13 +373,15 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
   }
 
-  void addEvent() {
+  void addEvent({required bool isDark}) {
     if (globalKey.currentState!.validate()) {
       if (selectedDate == null || selectedTime == null) {
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            backgroundColor: AppTheme.backgroundWhite,
+            backgroundColor: isDark
+                ? AppTheme.backgroundDark
+                : AppTheme.backgroundWhite,
             title: Text(
               'Select Time & Date',
               style: Theme.of(
@@ -386,7 +390,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             ),
             content: Text(
               'Please select both date and time for your event.',
-              style: Theme.of(context).textTheme.titleMedium,
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                color: isDark ? AppTheme.backgroundWhite : AppTheme.black,
+              ),
             ),
             actions: [
               TextButton(

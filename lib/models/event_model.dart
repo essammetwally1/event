@@ -9,8 +9,8 @@ class EventModel {
   String description;
   CategoryModel categoryModel;
   DateTime dateTime;
-  LatLng? location; // Add location field
-  String? address; // Add address field
+  LatLng? location;
+  String? address;
 
   EventModel({
     this.id = '',

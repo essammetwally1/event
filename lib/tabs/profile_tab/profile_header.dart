@@ -1,5 +1,6 @@
 import 'package:event/app_theme.dart';
 import 'package:event/models/user_model.dart';
+import 'package:event/provider/settings_provider.dart';
 import 'package:event/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,22 +11,19 @@ class ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    UserModel? userModel = Provider.of<UserProvider>(context).currentUser;
+    final UserModel? userModel = Provider.of<UserProvider>(context).currentUser;
+    final bool isDark = Provider.of<SettingsProvider>(context).isDark;
     return Container(
       padding: EdgeInsets.only(bottom: 16, left: 20, right: 16, top: 20),
       decoration: BoxDecoration(
-        color: AppTheme.primary,
+        color: isDark
+            ? AppTheme.primary.withValues(alpha: .5)
+            : AppTheme.primary,
         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(64)),
       ),
       child: SafeArea(
         child: Row(
           children: [
-            // Image.asset(
-            //   'assets/routeLogo.png',
-            //   height: 124,
-            //   width: 124,
-            //   fit: BoxFit.fill,
-            // ),
             SizedBox(width: 16),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
