@@ -3,6 +3,7 @@ import 'package:event/components/custom_create_eventrow.dart';
 import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/components/custom_textfield.dart';
 import 'package:event/firebase/firebase_service.dart';
+import 'package:event/screens/map_pikcer_screen.dart';
 import 'package:event/tabs/home_tab/tab_item.dart';
 import 'package:event/models/category_model.dart';
 import 'package:event/models/event_model.dart';
@@ -12,11 +13,13 @@ import 'package:event/screens/home_screen.dart';
 import 'package:event/utilis.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
 class UpdateEventScreen extends StatefulWidget {
-  final EventModel? eventModel;
-  const UpdateEventScreen({super.key, this.eventModel});
+  final EventModel eventModel;
+  const UpdateEventScreen({super.key, required this.eventModel});
 
   @override
   State<UpdateEventScreen> createState() => _UpdateEventScreenState();
@@ -30,19 +33,20 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
   TimeOfDay? selectedTime;
   bool isLoading = false;
   GlobalKey<FormState> globalKey = GlobalKey<FormState>();
+  late LatLng _pickedLatLng;
+  late String _pickedAddress;
   late bool isDark;
 
   @override
   void initState() {
     super.initState();
-    widget.eventModel != null
-        ? currentIndex = int.parse(widget.eventModel!.categoryModel.id) - 1
-        : 0;
-
-    titleController!.text = widget.eventModel!.title;
-    descriptionController!.text = widget.eventModel!.description;
-    selectedDate = widget.eventModel!.dateTime;
-    selectedTime = TimeOfDay.fromDateTime(widget.eventModel!.dateTime);
+    currentIndex = int.parse(widget.eventModel.categoryModel.id) - 1;
+    _pickedLatLng = widget.eventModel.location!;
+    _pickedAddress = widget.eventModel.address!;
+    titleController!.text = widget.eventModel.title;
+    descriptionController!.text = widget.eventModel.description;
+    selectedDate = widget.eventModel.dateTime;
+    selectedTime = TimeOfDay.fromDateTime(widget.eventModel.dateTime);
   }
 
   @override
@@ -124,7 +128,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
                       ),
                     ),
                     CustomTextFormField(
-                      hintText: widget.eventModel!.title,
+                      hintText: widget.eventModel.title,
 
                       iconPathName: 'titleEvent',
                       controller: titleController,
@@ -145,13 +149,13 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
                     CustomTextFormField(
                       controller: descriptionController,
                       maxLines: 4,
-                      hintText: widget.eventModel!.description,
+                      hintText: widget.eventModel.description,
                     ),
                     CustomCreateEventRow(
                       textTheme: textTheme,
                       label: 'Date',
                       iconName: 'date',
-                      date: selectedDate ?? widget.eventModel!.dateTime,
+                      date: selectedDate ?? widget.eventModel.dateTime,
                       onPressed: () async {
                         selectedDate = await showDatePicker(
                           context: context,
@@ -169,7 +173,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
 
                       time:
                           selectedTime ??
-                          TimeOfDay.fromDateTime(widget.eventModel!.dateTime),
+                          TimeOfDay.fromDateTime(widget.eventModel.dateTime),
                       onPressed: () async {
                         selectedTime = await showTimePicker(
                           context: context,
@@ -177,6 +181,77 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
                         );
                         setState(() {});
                       },
+                    ),
+                    InkWell(
+                      onTap: () async {
+                        // Use the current picked location or device location as initial
+                        final LatLng initial = _pickedLatLng;
+
+                        final result = await Navigator.push<LatLng>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => MapPickerScreen(
+                              initial: initial,
+                              isSelected: false,
+                            ),
+                          ),
+                        );
+
+                        if (result != null) {
+                          setState(() {
+                            _pickedLatLng = result;
+                            _pickedAddress =
+                                '${result.latitude.toStringAsFixed(4)}, ${result.longitude.toStringAsFixed(4)}';
+                          });
+                        }
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        margin: EdgeInsets.only(top: 5, bottom: 16),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppTheme.primary, width: 2),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: AppTheme.primary,
+                              ),
+                              child: SvgPicture.asset(
+                                'assets/icons/pickLocation.svg',
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Tap to select other location',
+                                    style: textTheme.titleMedium,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    _pickedAddress,
+                                    style: textTheme.titleSmall!.copyWith(
+                                      color: AppTheme.primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              color: AppTheme.primary,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
 
                     CustomElevatedButton(
@@ -229,7 +304,9 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
           description: descriptionController!.text,
           categoryModel: CategoryModel.categoryList[currentIndex],
           dateTime: dateTime,
-          id: widget.eventModel!.id,
+          id: widget.eventModel.id,
+          address: _pickedAddress,
+          location: _pickedLatLng,
         );
         FirebaseService.updateEvent(eventModel)
             .then((_) {

@@ -145,19 +145,23 @@ class _EventItemScreenState extends State<EventItemScreen> {
               ),
             ),
             SizedBox(height: 8),
-            Text(
-              'Description :',
-              style: textTheme.headlineSmall!.copyWith(
-                color: isDark ? AppTheme.backgroundWhite : AppTheme.black,
-              ),
-            ),
-            Text(
-              textAlign: TextAlign.center,
-              widget.eventModel.description,
-              style: textTheme.titleLarge!.copyWith(
-                color: isDark ? AppTheme.backgroundWhite : AppTheme.black,
-              ),
-            ),
+            widget.eventModel.description != ''
+                ? Text(
+                    'Description :',
+                    style: textTheme.headlineSmall!.copyWith(
+                      color: isDark ? AppTheme.backgroundWhite : AppTheme.black,
+                    ),
+                  )
+                : SizedBox(),
+            widget.eventModel.description != ''
+                ? Text(
+                    textAlign: TextAlign.center,
+                    widget.eventModel.description,
+                    style: textTheme.titleLarge!.copyWith(
+                      color: isDark ? AppTheme.backgroundWhite : AppTheme.black,
+                    ),
+                  )
+                : SizedBox(),
             SizedBox(height: 8),
 
             // Date & Time Section
@@ -227,21 +231,19 @@ class _EventItemScreenState extends State<EventItemScreen> {
                     }
                   });
                 },
+
                 child: Container(
-                  padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppTheme.primary, width: 2),
-                    color: isDark
-                        ? AppTheme.backgroundDark
-                        : AppTheme.backgroundWhite,
+                    border: Border.all(color: AppTheme.primary, width: 1),
                   ),
                   child: Row(
                     children: [
                       Container(
-                        padding: EdgeInsets.all(12),
+                        padding: EdgeInsets.all(20),
+                        margin: EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(16),
                           color: AppTheme.primary,
                         ),
                         child: SvgPicture.asset(
@@ -254,45 +256,43 @@ class _EventItemScreenState extends State<EventItemScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Event Location',
-                              style: textTheme.titleMedium!.copyWith(
-                                color: isDark
-                                    ? AppTheme.backgroundWhite
-                                    : AppTheme.black,
-                                fontWeight: FontWeight.w600,
-                              ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Event Location',
+                            style: textTheme.titleMedium!.copyWith(
+                              color: isDark
+                                  ? AppTheme.backgroundWhite
+                                  : AppTheme.black,
+                              fontWeight: FontWeight.w600,
                             ),
-                            SizedBox(height: 4),
-                            Text(
-                              widget.eventModel.address ??
-                                  _formatCoordinates(
-                                    widget.eventModel.location!,
-                                  ),
-                              style: textTheme.titleSmall!.copyWith(
-                                color: AppTheme.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            widget.eventModel.address ??
+                                _formatCoordinates(widget.eventModel.location!),
+                            style: textTheme.titleSmall!.copyWith(
+                              color: AppTheme.primary,
+                              fontWeight: FontWeight.bold,
                             ),
-                          ],
-                        ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ],
                       ),
+                      Spacer(),
                       Icon(
                         _showMapPreview ? Icons.expand_less : Icons.expand_more,
                         color: AppTheme.primary,
                         size: 24,
                       ),
+                      SizedBox(width: 5),
                     ],
                   ),
                 ),
               ),
+
               // Google Maps Preview (Expanded Section)
               if (_showMapPreview) ...[
                 SizedBox(height: 12),
@@ -306,11 +306,7 @@ class _EventItemScreenState extends State<EventItemScreen> {
                       width: 2,
                     ),
                     boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.black.withValues(alpha: 0.1),
-                        blurRadius: 8,
-                        offset: Offset(0, 4),
-                      ),
+                      BoxShadow(color: AppTheme.primary, blurRadius: 2),
                     ],
                   ),
                   child: ClipRRect(
@@ -323,7 +319,7 @@ class _EventItemScreenState extends State<EventItemScreen> {
                         // Loading Indicator
                         if (_isMapLoading)
                           Container(
-                            color: Colors.black.withOpacity(0.3),
+                            color: Colors.black.withValues(alpha: 0.3),
                             child: Center(
                               child: Container(
                                 padding: EdgeInsets.all(20),

@@ -355,6 +355,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         ),
                       ),
                     ),
+
                     CustomElevatedButton(
                       isLoading: isLoading,
 

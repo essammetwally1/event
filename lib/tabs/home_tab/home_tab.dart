@@ -20,6 +20,7 @@ class _HomeTabState extends State<HomeTab> {
       body: Column(
         children: [
           HomeHeader(),
+          SizedBox(height: 5),
           eventProvider.filteredEvents.isNotEmpty
               ? Expanded(
                   child: ListView.separated(
