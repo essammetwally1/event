@@ -1,4 +1,3 @@
-import 'package:event/app_theme.dart';
 import 'package:event/auth/register_screen.dart';
 import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/components/custom_textfield.dart';
@@ -6,7 +5,9 @@ import 'package:event/firebase/firebase_service.dart';
 import 'package:event/provider/settings_provider.dart';
 import 'package:event/provider/user_provider.dart';
 import 'package:event/screens/home_screen.dart';
-import 'package:event/utilis.dart';
+import 'package:event/shared/app_theme.dart';
+import 'package:event/shared/user_storage_service.dart';
+import 'package:event/shared/utilis.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +27,20 @@ class _LoginScreenState extends State<LoginScreen> {
   late bool isDark;
   bool isLoading = false;
   bool isGoogleLoading = false;
+  bool rememberMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkRememberMeStatus();
+  }
+
+  Future<void> _checkRememberMeStatus() async {
+    final isRememberMeEnabled = await UserStorageService.isRememberMeEnabled();
+    setState(() {
+      rememberMe = isRememberMeEnabled;
+    });
+  }
 
   @override
   void dispose() {
@@ -102,6 +117,41 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                     }
                   },
+                ),
+
+                // Add Remember Me checkbox here
+                SizedBox(height: 16),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: rememberMe,
+                      onChanged: (val) {
+                        setState(() => rememberMe = val ?? false);
+                      },
+                      // fill color of the box (white when unchecked, still white when checked)
+                      fillColor: WidgetStateProperty.resolveWith<Color>(
+                        (states) => AppTheme.primary,
+                      ),
+                      // the tick/check color
+                      checkColor: AppTheme.backgroundWhite,
+                      // rounded corners
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          6,
+                        ), // adjust roundness
+                      ),
+                      side: BorderSide(
+                        color: AppTheme.primary, // outline color when unchecked
+                        width: 2,
+                        strokeAlign: 1,
+                      ),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    Text(
+                      "Remember me",
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 24),
                 CustomElevatedButton(
@@ -187,6 +237,12 @@ class _LoginScreenState extends State<LoginScreen> {
         final user = await FirebaseService.logIn(
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
+        );
+
+        // Save user ID if Remember Me is checked
+        await UserStorageService.saveUserCredentials(
+          userId: user.id,
+          rememberMe: rememberMe,
         );
 
         Provider.of<UserProvider>(

@@ -1,4 +1,4 @@
-import 'package:event/app_theme.dart';
+import 'package:event/shared/app_theme.dart';
 import 'package:event/components/navbar_icon.dart';
 import 'package:event/tabs/home_tab/home_tab.dart';
 import 'package:event/tabs/love_tab/love_tab.dart';

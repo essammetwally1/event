@@ -1,4 +1,4 @@
-import 'package:event/app_theme.dart';
+import 'package:event/shared/app_theme.dart';
 import 'package:event/tabs/profile_tab/language_model.dart';
 import 'package:event/provider/settings_provider.dart';
 import 'package:flutter/material.dart';

@@ -1,4 +1,3 @@
-import 'package:event/app_theme.dart';
 import 'package:event/auth/login_screen.dart';
 import 'package:event/auth/register_screen.dart';
 import 'package:event/provider/event_provider.dart';
@@ -7,6 +6,8 @@ import 'package:event/provider/user_provider.dart';
 import 'package:event/screens/create_event_screen.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:event/screens/onboarding_screen.dart';
+import 'package:event/screens/root_decider_screen.dart';
+import 'package:event/shared/app_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,8 +34,9 @@ class EventApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: LoginScreen.routeName,
+      initialRoute: RootDeciderScreen.routeName,
       routes: {
+        RootDeciderScreen.routeName: (context) => RootDeciderScreen(),
         HomeScreen.routeName: (context) => HomeScreen(),
         LoginScreen.routeName: (context) => LoginScreen(),
         RegisterScreen.routeName: (context) => RegisterScreen(),

@@ -1,4 +1,4 @@
-import 'package:event/app_theme.dart';
+import 'package:event/shared/app_theme.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class Utils {

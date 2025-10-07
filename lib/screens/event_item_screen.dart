@@ -1,4 +1,4 @@
-import 'package:event/app_theme.dart';
+import 'package:event/shared/app_theme.dart';
 import 'package:event/components/action_icon_button.dart';
 import 'package:event/firebase/firebase_service.dart';
 import 'package:event/models/event_model.dart';
@@ -6,7 +6,7 @@ import 'package:event/provider/event_provider.dart';
 import 'package:event/provider/settings_provider.dart';
 import 'package:event/screens/home_screen.dart';
 import 'package:event/screens/update_event_screen.dart';
-import 'package:event/utilis.dart';
+import 'package:event/shared/utilis.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';

@@ -1,4 +1,4 @@
-import 'package:event/app_theme.dart';
+import 'package:event/shared/app_theme.dart';
 import 'package:event/models/event_model.dart';
 import 'package:event/provider/event_provider.dart';
 import 'package:event/provider/settings_provider.dart';
