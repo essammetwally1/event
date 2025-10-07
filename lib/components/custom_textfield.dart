@@ -45,10 +45,12 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
       },
       autovalidateMode: AutovalidateMode.onUserInteraction,
       cursorColor: AppTheme.primary,
-      style: Theme.of(context).textTheme.titleMedium,
+      style: Theme.of(
+        context,
+      ).textTheme.titleLarge!.copyWith(color: AppTheme.primary),
       decoration: InputDecoration(
         hintText: widget.hintText,
-
+        contentPadding: EdgeInsets.all(16),
         suffixIcon: widget.isPassword
             ? IconButton(
                 highlightColor: Colors.transparent,

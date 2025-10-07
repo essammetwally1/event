@@ -23,10 +23,10 @@ class ProfileHeader extends StatelessWidget {
       ),
       child: SafeArea(
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(width: 16),
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(userModel!.name, style: textTheme.headlineSmall),
                 SizedBox(height: 10),

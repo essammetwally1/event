@@ -5,7 +5,6 @@ import 'package:event/provider/event_provider.dart';
 import 'package:event/provider/settings_provider.dart';
 import 'package:event/provider/user_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 class HomeHeader extends StatefulWidget {
@@ -25,7 +24,9 @@ class _HomeHeaderState extends State<HomeHeader> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
-        color: isDark ? AppTheme.backgroundDark : AppTheme.primary,
+        color: isDark
+            ? AppTheme.primary.withValues(alpha: .5)
+            : AppTheme.primary,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(24),
@@ -41,16 +42,7 @@ class _HomeHeaderState extends State<HomeHeader> {
               Provider.of<UserProvider>(context).currentUser!.name,
               style: textTheme.headlineSmall,
             ),
-            SizedBox(height: 5),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                SvgPicture.asset('assets/icons/location.svg'),
-                SizedBox(width: 10),
-                Text('Cairo , Egypt', style: textTheme.titleSmall),
-              ],
-            ),
             SizedBox(height: 8),
 
             DefaultTabController(
