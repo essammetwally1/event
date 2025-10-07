@@ -102,14 +102,3 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 
-# flutter_native_splash:
-#   color: "#F2FEFF"
-#   image: assets/Logo.png
-#   branding: assets/branding.png
-#   branding_mode: bottom
-
-#   android_12:
-#     color: "#F2FEFF"
-#     image: assets/logoAndroid.png
-#     branding: assets/branding.png
-

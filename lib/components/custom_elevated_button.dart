@@ -7,6 +7,7 @@ class CustomElevatedButton extends StatelessWidget {
   final bool isLoading;
   final Color color;
   final TextStyle? textStyle;
+  final bool isGoogle;
   const CustomElevatedButton({
     super.key,
     required this.textElevatedButton,
@@ -14,6 +15,7 @@ class CustomElevatedButton extends StatelessWidget {
     this.isLoading = false,
     this.color = AppTheme.primary,
     this.textStyle,
+    this.isGoogle = false,
   });
 
   @override
@@ -28,7 +30,7 @@ class CustomElevatedButton extends StatelessWidget {
           ? Center(
               child: CircularProgressIndicator(color: AppTheme.backgroundWhite),
             )
-          : textElevatedButton == 'Login With Google'
+          : isGoogle
           ? Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

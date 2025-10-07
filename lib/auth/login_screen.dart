@@ -25,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   GlobalKey<FormState> globalKey = GlobalKey<FormState>();
   late bool isDark;
   bool isLoading = false;
+  bool isGoogleLoading = false;
 
   @override
   void dispose() {
@@ -41,9 +42,15 @@ class _LoginScreenState extends State<LoginScreen> {
         centerTitle: true,
         title: Text(
           'Login',
-          style: Theme.of(
-            context,
-          ).textTheme.titleLarge!.copyWith(color: AppTheme.black),
+          style: Theme.of(context).textTheme.titleLarge!.copyWith(
+            color: AppTheme.primary,
+            shadows: [
+              Shadow(
+                color: AppTheme.black.withValues(alpha: 0.5),
+                blurRadius: 1,
+              ),
+            ],
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -53,9 +60,18 @@ class _LoginScreenState extends State<LoginScreen> {
             key: globalKey,
             child: Column(
               children: [
-                const SizedBox(height: 50),
-                Image.asset('assets/Logo.png'),
-                const SizedBox(height: 24),
+                SizedBox(height: 16),
+                ClipRRect(
+                  borderRadius: BorderRadiusGeometry.circular(28),
+                  child: Image.asset(
+                    'assets/logoimage.png',
+                    width: 150,
+                    height: 150,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                SizedBox(height: 50),
+
                 CustomTextFormField(
                   hintText: 'Email',
                   iconPathName: 'mail',
@@ -88,7 +104,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 ),
                 const SizedBox(height: 24),
-
                 CustomElevatedButton(
                   isLoading: isLoading,
                   onPressed: login,
@@ -147,7 +162,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 16),
                 CustomElevatedButton(
-                  textElevatedButton: 'Login With Google',
+                  isGoogle: true,
+                  isLoading: isGoogleLoading,
+                  textElevatedButton: 'Continue With Google',
                   onPressed: () {},
                 ),
               ],

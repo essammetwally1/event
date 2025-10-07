@@ -37,9 +37,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
         centerTitle: true,
         title: Text(
           'Register',
-          style: Theme.of(
-            context,
-          ).textTheme.titleLarge!.copyWith(color: AppTheme.black),
+          style: Theme.of(context).textTheme.titleLarge!.copyWith(
+            color: AppTheme.primary,
+            shadows: [
+              Shadow(
+                color: AppTheme.black.withValues(alpha: 0.5),
+                blurRadius: 1,
+              ),
+            ],
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -50,8 +56,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset('assets/Logo.png'),
-                SizedBox(height: 24),
+                SizedBox(height: 16),
+                ClipRRect(
+                  borderRadius: BorderRadiusGeometry.circular(28),
+                  child: Image.asset(
+                    'assets/logoimage.png',
+                    width: 150,
+                    height: 150,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                SizedBox(height: 50),
                 CustomTextFormField(
                   hintText: 'Name',
                   iconPathName: 'name',
@@ -129,6 +144,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ],
                 ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        thickness: 1,
+                        indent: 30,
+                        color: AppTheme.primary,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Text(
+                        'or',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        thickness: 1,
+                        endIndent: 30,
+                        color: AppTheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
               ],
             ),
           ),

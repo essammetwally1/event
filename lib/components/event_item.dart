@@ -3,6 +3,7 @@ import 'package:event/models/event_model.dart';
 import 'package:event/provider/event_provider.dart';
 import 'package:event/provider/settings_provider.dart';
 import 'package:event/provider/user_provider.dart';
+import 'package:event/screens/event_item_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -28,115 +29,128 @@ class _EventItemState extends State<EventItem> {
     TextTheme textTheme = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Image.asset(
-              'assets/categoreis/${widget.event.categoryModel.imageName}.png',
-              height: screenSize.height * .35,
-              width: screenSize.width,
-              fit: BoxFit.fill,
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) {
+                return EventItemScreen(eventModel: widget.event);
+              },
             ),
-          ),
-          Container(
-            padding: EdgeInsets.all(8),
-            margin: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? AppTheme.backgroundDark
-                  : AppTheme.backgroundWhite,
-              borderRadius: BorderRadius.circular(8),
+          );
+        },
+        child: Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.asset(
+                'assets/categoreis/${widget.event.categoryModel.imageName}.png',
+                height: screenSize.height * .35,
+                width: screenSize.width,
+                fit: BoxFit.fill,
+              ),
             ),
-            child: Column(
-              children: [
-                Text(
-                  widget.event.dateTime.day.toString(),
-                  style: textTheme.titleLarge!.copyWith(
-                    color: AppTheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  DateFormat('MMM').format(widget.event.dateTime).toUpperCase(),
-                  style: textTheme.titleLarge!.copyWith(
-                    color: AppTheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: 8,
-            right: 8,
-            left: 8,
-            child: Container(
-              padding: const EdgeInsets.all(8),
+            Container(
+              padding: EdgeInsets.all(8),
+              margin: EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: isDark
                     ? AppTheme.backgroundDark
                     : AppTheme.backgroundWhite,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Row(
+              child: Column(
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.event.title,
-                          style: textTheme.titleMedium!.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          widget.event.description,
-                          style: textTheme.titleSmall!.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: isDark
-                                ? AppTheme.backgroundWhite
-                                : AppTheme.primary,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                  Text(
+                    widget.event.dateTime.day.toString(),
+                    style: textTheme.titleLarge!.copyWith(
+                      color: AppTheme.primary,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () {
-                      if (isLoved) {
-                        userProvider.removeEventToFavourite(widget.event.id);
-                        Provider.of<EventProvider>(
-                          context,
-                          listen: false,
-                        ).filterFavouriteEvents(
-                          userProvider.currentUser!.favouriteEventsIds,
-                        );
-                      } else {
-                        userProvider.addEventToFavourite(widget.event.id);
-                      }
-                      setState(() {});
-                    },
-                    child: Icon(
-                      isLoved
-                          ? Icons.favorite_sharp
-                          : Icons.favorite_outline_outlined,
+                  Text(
+                    DateFormat(
+                      'MMM',
+                    ).format(widget.event.dateTime).toUpperCase(),
+                    style: textTheme.titleLarge!.copyWith(
                       color: AppTheme.primary,
-                      size: 30,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            Positioned(
+              bottom: 8,
+              right: 8,
+              left: 8,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppTheme.backgroundDark
+                      : AppTheme.backgroundWhite,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.event.title,
+                            style: textTheme.titleMedium!.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            widget.event.description,
+                            style: textTheme.titleSmall!.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: isDark
+                                  ? AppTheme.backgroundWhite
+                                  : AppTheme.primary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () {
+                        if (isLoved) {
+                          userProvider.removeEventToFavourite(widget.event.id);
+                          Provider.of<EventProvider>(
+                            context,
+                            listen: false,
+                          ).filterFavouriteEvents(
+                            userProvider.currentUser!.favouriteEventsIds,
+                          );
+                        } else {
+                          userProvider.addEventToFavourite(widget.event.id);
+                        }
+                        setState(() {});
+                      },
+                      child: Icon(
+                        isLoved
+                            ? Icons.favorite_sharp
+                            : Icons.favorite_outline_outlined,
+                        color: AppTheme.primary,
+                        size: 30,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
