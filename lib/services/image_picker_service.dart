@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:event/provider/settings_provider.dart';
+import 'package:event/shared/utilis.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,6 +15,11 @@ class ImagePickerService {
 
   /// Full flow: pick -> crop -> upload to Supabase -> update provider
   static Future<void> pickAndUploadAvatar(BuildContext context) async {
+    final bool isDark = Provider.of<SettingsProvider>(
+      context,
+      listen: false,
+    ).isDark;
+
     bool showProgress = false;
 
     try {
@@ -24,7 +31,7 @@ class ImagePickerService {
         return;
       }
 
-      final source = await _showSourceSelection(context);
+      final source = await _showSourceSelection(context, isDark);
       if (source == null) return;
 
       final XFile? pickedFile = await _pickImage(source);
@@ -54,8 +61,13 @@ class ImagePickerService {
 
   /// Alternative: Just pick and crop without upload (returns File)
   static Future<File?> pickAndCropImage(BuildContext context) async {
+    final bool isDark = Provider.of<SettingsProvider>(
+      context,
+      listen: false,
+    ).isDark;
+
     try {
-      final source = await _showSourceSelection(context);
+      final source = await _showSourceSelection(context, isDark);
       if (source == null) return null;
 
       final XFile? pickedFile = await _pickImage(source);
@@ -68,12 +80,17 @@ class ImagePickerService {
     }
   }
 
-  static Future<ImageSource?> _showSourceSelection(BuildContext context) {
-    final theme = Theme.of(context);
+  static Future<ImageSource?> _showSourceSelection(
+    BuildContext context,
+    bool isDark,
+  ) {
+    final TextTheme theme = Theme.of(context).textTheme;
 
     return showModalBottomSheet<ImageSource>(
       context: context,
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: isDark
+          ? AppTheme.backgroundDark
+          : AppTheme.backgroundWhite,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -83,16 +100,73 @@ class ImagePickerService {
           children: [
             ListTile(
               leading: Icon(Icons.photo_library, color: AppTheme.primary),
-              title: Text(
-                'Choose from Gallery',
-                style: theme.textTheme.titleMedium,
-              ),
+              title: Text('Choose from Gallery', style: theme.titleMedium),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
             ListTile(
               leading: Icon(Icons.photo_camera, color: AppTheme.primary),
-              title: Text('Take a Photo', style: theme.textTheme.titleMedium),
+              title: Text('Take a Photo', style: theme.titleMedium),
               onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: Icon(Icons.delete, color: AppTheme.red),
+              title: Text(
+                'Delete Profile Image',
+                style: theme.titleMedium!.copyWith(color: AppTheme.red),
+              ),
+              onTap: () {
+                Navigator.pop(context); // Close the bottom sheet first
+
+                // Show confirmation dialog
+                showDialog(
+                  barrierColor: AppTheme.primary.withValues(alpha: 0.3),
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: AppTheme.backgroundWhite,
+                    title: Text(
+                      'Delete Profile Image',
+                      style: theme.titleLarge!.copyWith(color: AppTheme.red),
+                    ),
+                    content: Text(
+                      'Are you sure you want to delete your profile image?',
+                      style: theme.titleMedium!.copyWith(color: AppTheme.black),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(
+                          'Cancel',
+                          style: theme.titleMedium!.copyWith(
+                            color: AppTheme.primary,
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.pop(context); // Close confirmation dialog
+                          try {
+                            final userProvider = Provider.of<UserProvider>(
+                              context,
+                              listen: false,
+                            );
+                            await userProvider.deleteProfileImage();
+                          } catch (e) {
+                            Utils.showErrorMessage(
+                              'Failed to delete image: ${e.toString()}',
+                            );
+                          }
+                        },
+                        child: Text(
+                          'Delete',
+                          style: theme.titleMedium!.copyWith(
+                            color: AppTheme.red,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ],
         ),

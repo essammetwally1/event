@@ -44,6 +44,18 @@ class SupabaseService {
     }
   }
 
+  /// Delete user's avatar from Supabase storage
+  static Future<bool> delete(String uid) async {
+    try {
+      await _client.storage.from(bucket).remove(['$uid/profile.jpg']);
+      Utils.showSuccessMessage('Profile image removed');
+      return true;
+    } catch (e) {
+      Utils.showErrorMessage('Failed to remove image');
+      return false;
+    }
+  }
+
   static Future<bool> exists(String uid) async {
     try {
       final files = await _client.storage.from(bucket).list(path: uid);

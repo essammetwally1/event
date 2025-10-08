@@ -8,7 +8,6 @@ class UserProvider with ChangeNotifier {
   UserModel? _currentUser;
   bool _isLoading = false;
   String? _error;
-  bool _isNotifying = false;
 
   UserModel? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
@@ -19,19 +18,22 @@ class UserProvider with ChangeNotifier {
   void updateCurrentUser(UserModel? user) {
     _currentUser = user;
     _error = null;
-    _scheduleNotifyListeners();
+    notifyListeners();
+    ();
   }
 
   Future<bool> autoLogin() async {
     _isLoading = true;
     _error = null;
-    _scheduleNotifyListeners();
+    notifyListeners();
+    ();
 
     try {
       final storedUserId = await UserStorageService.getStoredUserId();
       if (storedUserId == null) {
         _isLoading = false;
-        _scheduleNotifyListeners();
+        notifyListeners();
+        ();
         return false;
       }
 
@@ -59,18 +61,21 @@ class UserProvider with ChangeNotifier {
 
         _currentUser = updatedUser;
         _isLoading = false;
-        _scheduleNotifyListeners();
+        notifyListeners();
+        ();
         return true;
       } else {
         await UserStorageService.clearUserCredentials();
         _isLoading = false;
-        _scheduleNotifyListeners();
+        notifyListeners();
+        ();
         return false;
       }
     } catch (error) {
       await UserStorageService.clearUserCredentials();
       _isLoading = false;
-      _scheduleNotifyListeners();
+      notifyListeners();
+      ();
       return false;
     }
   }
@@ -80,7 +85,8 @@ class UserProvider with ChangeNotifier {
 
     _isLoading = true;
     _error = null;
-    _scheduleNotifyListeners();
+    notifyListeners();
+    ();
 
     try {
       final imageUrl = await FirebaseService.uploadUserImage(
@@ -101,7 +107,8 @@ class UserProvider with ChangeNotifier {
       _error = 'Error updating profile image';
     } finally {
       _isLoading = false;
-      _scheduleNotifyListeners();
+      notifyListeners();
+      ();
     }
   }
 
@@ -120,7 +127,8 @@ class UserProvider with ChangeNotifier {
       imageUrl: _currentUser!.imageUrl,
       favouriteEventsIds: [..._currentUser!.favouriteEventsIds, eventId],
     );
-    _scheduleNotifyListeners();
+    notifyListeners();
+    ();
   }
 
   void removeEventFromFavourite(String eventId) {
@@ -136,30 +144,53 @@ class UserProvider with ChangeNotifier {
           .where((id) => id != eventId)
           .toList(),
     );
-    _scheduleNotifyListeners();
+    notifyListeners();
+    ();
   }
 
   void clearUser() {
     _currentUser = null;
     _error = null;
     _isLoading = false;
-    _scheduleNotifyListeners();
+    notifyListeners();
+    ();
   }
 
   void clearError() {
     _error = null;
-    _scheduleNotifyListeners();
+    notifyListeners();
+    ();
   }
 
-  void _scheduleNotifyListeners() {
-    if (_isNotifying) return;
-    _isNotifying = true;
+  Future<void> deleteProfileImage() async {
+    if (_currentUser == null) return;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _isNotifying = false;
-      if (hasListeners) {
-        notifyListeners();
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      // Call Supabase to delete the image
+      final success = await SupabaseService.delete(_currentUser!.id);
+
+      if (success) {
+        // Update local user model to remove image URL
+        _currentUser = UserModel(
+          id: _currentUser!.id,
+          name: _currentUser!.name,
+          email: _currentUser!.email,
+          imageUrl: null,
+          favouriteEventsIds: _currentUser!.favouriteEventsIds,
+        );
+        _error = null;
+      } else {
+        _error = 'Failed to delete profile image';
       }
-    });
+    } catch (e) {
+      _error = 'Error deleting profile image: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }
