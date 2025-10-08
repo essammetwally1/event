@@ -126,7 +126,7 @@ class FirebaseService {
     }
   }
 
-  static Future<void> updateUserProfile({
+  static Future<void> updateUserProfileImage({
     required String userId,
     String? imageUrl,
     String? name,
@@ -152,7 +152,7 @@ class FirebaseService {
       );
 
       if (imageUrl != null) {
-        await updateUserProfile(userId: userId, imageUrl: imageUrl);
+        await updateUserProfileImage(userId: userId, imageUrl: imageUrl);
       }
 
       return imageUrl;

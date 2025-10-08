@@ -28,29 +28,6 @@ class _DropdownSectionState extends State<DropdownSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Text(
-              'Dark Theme',
-              style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                color: isDark ? AppTheme.backgroundWhite : AppTheme.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Spacer(),
-            Switch(
-              activeTrackColor: AppTheme.primary,
-              inactiveTrackColor: AppTheme.backgroundWhite,
-              value: isDark,
-              onChanged: (value) {
-                settingsProvider.changeTheme(
-                  value ? ThemeMode.dark : ThemeMode.light,
-                );
-              },
-            ),
-          ],
-        ),
-
         SizedBox(height: 16),
         Row(
           children: [
