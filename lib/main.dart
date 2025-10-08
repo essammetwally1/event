@@ -11,10 +11,16 @@ import 'package:event/shared/app_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await Supabase.initialize(
+    url: 'https://gaxkwtyozcmccafihhif.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdheGt3dHlvemNtY2NhZmloaGlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4ODA4NjYsImV4cCI6MjA3NTQ1Njg2Nn0.w_tSdfw61bOnuyN5Sce0qsXT5tcswzZ9r15tuJcOd7I',
+  );
   runApp(
     MultiProvider(
       providers: [

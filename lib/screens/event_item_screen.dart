@@ -1,6 +1,6 @@
 import 'package:event/shared/app_theme.dart';
 import 'package:event/components/action_icon_button.dart';
-import 'package:event/firebase/firebase_service.dart';
+import 'package:event/services/firebase_service.dart';
 import 'package:event/models/event_model.dart';
 import 'package:event/provider/event_provider.dart';
 import 'package:event/provider/settings_provider.dart';

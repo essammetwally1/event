@@ -4,7 +4,7 @@ import 'package:event/shared/app_theme.dart';
 import 'package:event/auth/login_screen.dart';
 import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/components/custom_textfield.dart';
-import 'package:event/firebase/firebase_service.dart';
+import 'package:event/services/firebase_service.dart';
 import 'package:event/provider/settings_provider.dart';
 import 'package:event/provider/user_provider.dart';
 import 'package:event/shared/utilis.dart';
@@ -141,31 +141,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         context,
                       ).pushReplacementNamed(LoginScreen.routeName),
                       child: Text('Login'),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                        thickness: 1,
-                        indent: 30,
-                        color: AppTheme.primary,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text(
-                        'or',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ),
-                    Expanded(
-                      child: Divider(
-                        thickness: 1,
-                        endIndent: 30,
-                        color: AppTheme.primary,
-                      ),
                     ),
                   ],
                 ),

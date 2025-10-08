@@ -1,4 +1,4 @@
-import 'package:event/firebase/firebase_service.dart';
+import 'package:event/services/firebase_service.dart';
 import 'package:event/models/category_model.dart';
 import 'package:event/models/event_model.dart';
 import 'package:flutter/foundation.dart';

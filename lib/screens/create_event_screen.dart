@@ -2,7 +2,7 @@ import 'package:event/shared/app_theme.dart';
 import 'package:event/components/custom_create_eventrow.dart';
 import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/components/custom_textfield.dart';
-import 'package:event/firebase/firebase_service.dart';
+import 'package:event/services/firebase_service.dart';
 import 'package:event/screens/map_pikcer_screen.dart';
 import 'package:event/tabs/home_tab/tab_item.dart';
 import 'package:event/models/category_model.dart';

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:event/shared/app_theme.dart';
 import 'package:event/components/custom_elevated_button.dart';
 import 'package:event/models/event_model.dart';
@@ -535,7 +533,7 @@ class _MapTabState extends State<MapTab> with TickerProviderStateMixin {
                       itemCount: _allEvents.length,
                       itemBuilder: (context, index) {
                         final event = _allEvents[index];
-                        return _buildEventListItem(event, index);
+                        return _buildEventListItem(event, index, isDark);
                       },
                     ),
             ),
@@ -562,7 +560,7 @@ class _MapTabState extends State<MapTab> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildEventListItem(EventModel event, int index) {
+  Widget _buildEventListItem(EventModel event, int index, bool isDark) {
     final hasLocation = event.location != null;
 
     return Container(
@@ -632,7 +630,9 @@ class _MapTabState extends State<MapTab> with TickerProviderStateMixin {
                           Icon(
                             Icons.calendar_today,
                             size: 12,
-                            color: AppTheme.black.withValues(alpha: 0.5),
+                            color: isDark
+                                ? AppTheme.backgroundWhite.withValues(alpha: .5)
+                                : AppTheme.black.withValues(alpha: 0.5),
                           ),
                           SizedBox(width: 4),
                           Text(
@@ -641,14 +641,20 @@ class _MapTabState extends State<MapTab> with TickerProviderStateMixin {
                                 ?.copyWith(
                                   fontSize: 14,
 
-                                  color: AppTheme.black.withValues(alpha: 0.6),
+                                  color: isDark
+                                      ? AppTheme.backgroundWhite.withValues(
+                                          alpha: .8,
+                                        )
+                                      : AppTheme.black.withValues(alpha: 0.6),
                                 ),
                           ),
                           SizedBox(width: 8),
                           Icon(
                             Icons.access_time,
                             size: 12,
-                            color: AppTheme.black.withValues(alpha: 0.5),
+                            color: isDark
+                                ? AppTheme.backgroundWhite.withValues(alpha: .5)
+                                : AppTheme.black.withValues(alpha: 0.5),
                           ),
                           SizedBox(width: 4),
                           Text(
@@ -656,7 +662,11 @@ class _MapTabState extends State<MapTab> with TickerProviderStateMixin {
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
                                   fontSize: 14,
-                                  color: AppTheme.black.withValues(alpha: 0.6),
+                                  color: isDark
+                                      ? AppTheme.backgroundWhite.withValues(
+                                          alpha: .8,
+                                        )
+                                      : AppTheme.black.withValues(alpha: 0.6),
                                 ),
                           ),
                         ],

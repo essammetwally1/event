@@ -125,7 +125,9 @@ class _EventItemState extends State<EventItem> {
                     GestureDetector(
                       onTap: () {
                         if (isLoved) {
-                          userProvider.removeEventToFavourite(widget.event.id);
+                          userProvider.removeEventFromFavourite(
+                            widget.event.id,
+                          );
                           Provider.of<EventProvider>(
                             context,
                             listen: false,
