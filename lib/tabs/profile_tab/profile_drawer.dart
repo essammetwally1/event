@@ -367,17 +367,33 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
                   onTap: () {},
                   isDark: isDark,
 
-                  child: ProfileCardSwitch(
-                    icon: Icons.dark_mode_outlined,
-                    title: 'Dark Theme',
-                    subtitle: 'Reduce eye strain with a darker palette',
-                    isDark: isDark,
-                    value: isDark,
-                    onChanged: (value) {
-                      settingsProvider.changeTheme(
-                        value ? ThemeMode.dark : ThemeMode.light,
-                      );
-                    },
+                  child: Column(
+                    children: [
+                      ProfileCardSwitch(
+                        icon: Icons.dark_mode_outlined,
+                        title: 'Dark Theme',
+                        subtitle: 'Reduce eye strain with a darker palette',
+                        isDark: isDark,
+                        // When system is active, we still compute the switch from current appearance.
+                        // Toggling always sets an explicit choice (dark/light) and persists it.
+                        value: isDark,
+                        onChanged: (value) {
+                          settingsProvider.changeTheme(
+                            value ? ThemeMode.dark : ThemeMode.light,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: () => settingsProvider.useSystemTheme(),
+                          icon: const Icon(Icons.smartphone),
+                          label: const Text('Use device theme'),
+                          // Optional: style it to match your theme
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 _buildExpandableDrawerItem(

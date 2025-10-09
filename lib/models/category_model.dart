@@ -16,7 +16,7 @@ class CategoryModel {
     CategoryModel(
       id: '1',
       label: 'Sport',
-      icon: Icons.sports,
+      icon: Icons.sports_baseball_outlined,
       imageName: 'sport',
     ),
     CategoryModel(
@@ -34,7 +34,7 @@ class CategoryModel {
     CategoryModel(
       id: '4',
       label: 'Eating',
-      icon: Icons.food_bank_outlined,
+      icon: Icons.restaurant_menu_outlined,
       imageName: 'eating',
     ),
     CategoryModel(
@@ -58,13 +58,13 @@ class CategoryModel {
     CategoryModel(
       id: '8',
       label: 'Meeting',
-      icon: Icons.meeting_room_outlined,
+      icon: Icons.meeting_room,
       imageName: 'meeting',
     ),
     CategoryModel(
       id: '9',
       label: 'Work Shop',
-      icon: Icons.workspace_premium_outlined,
+      icon: Icons.work,
       imageName: 'workshop',
     ),
   ];

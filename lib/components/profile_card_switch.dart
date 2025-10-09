@@ -5,8 +5,8 @@ class ProfileCardSwitch extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  final bool isDark; // for theming the card itself
-  final bool value; // current switch value
+  final bool isDark;
+  final bool value;
   final ValueChanged<bool> onChanged;
 
   const ProfileCardSwitch({
