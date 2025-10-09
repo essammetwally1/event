@@ -131,10 +131,10 @@ class UserProvider with ChangeNotifier {
     ();
   }
 
-  void removeEventFromFavourite(String eventId) {
+  void removeEventFromFavourite(String eventId) async {
     if (_currentUser == null) return;
 
-    FirebaseService.removeEventFromFavourite(eventId);
+    await FirebaseService.removeEventFromFavourite(eventId);
     _currentUser = UserModel(
       id: _currentUser!.id,
       name: _currentUser!.name,

@@ -366,32 +366,137 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
                   title: 'Settings',
                   onTap: () {},
                   isDark: isDark,
-
                   child: Column(
                     children: [
+                      // Theme Selection Card
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? AppTheme.backgroundDark
+                              : AppTheme.backgroundWhite,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Appearance',
+                              style: Theme.of(context).textTheme.titleMedium!
+                                  .copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 12),
+
+                            // System Theme Option
+                            ListTile(
+                              leading: Icon(
+                                Icons.smartphone,
+                                color: settingsProvider.isUsingSystemTheme
+                                    ? AppTheme.primary
+                                    : Colors.grey,
+                              ),
+                              title: Text(
+                                'Use device theme',
+                                style: Theme.of(context).textTheme.titleSmall!
+                                    .copyWith(
+                                      color: isDark
+                                          ? AppTheme.backgroundWhite
+                                          : AppTheme.backgroundDark,
+                                    ),
+                              ),
+                              trailing: settingsProvider.isUsingSystemTheme
+                                  ? Icon(
+                                      Icons.check_circle,
+                                      color: AppTheme.primary,
+                                    )
+                                  : null,
+                              onTap: () => settingsProvider.useSystemTheme(),
+                              contentPadding: EdgeInsets.zero,
+                            ),
+
+                            // Light Theme Option
+                            ListTile(
+                              leading: Icon(
+                                Icons.light_mode,
+                                color:
+                                    settingsProvider.themeMode ==
+                                        ThemeMode.light
+                                    ? AppTheme.primary
+                                    : Colors.grey,
+                              ),
+                              title: Text(
+                                'Light mode',
+                                style: Theme.of(context).textTheme.titleSmall!
+                                    .copyWith(
+                                      color: isDark
+                                          ? AppTheme.backgroundWhite
+                                          : AppTheme.backgroundDark,
+                                    ),
+                              ),
+                              trailing:
+                                  settingsProvider.themeMode == ThemeMode.light
+                                  ? Icon(
+                                      Icons.check_circle,
+                                      color: AppTheme.primary,
+                                    )
+                                  : null,
+                              onTap: () =>
+                                  settingsProvider.changeTheme(ThemeMode.light),
+                              contentPadding: EdgeInsets.zero,
+                            ),
+
+                            // Dark Theme Option
+                            ListTile(
+                              leading: Icon(
+                                Icons.dark_mode,
+                                color:
+                                    settingsProvider.themeMode == ThemeMode.dark
+                                    ? AppTheme.primary
+                                    : Colors.grey,
+                              ),
+                              title: Text(
+                                'Dark mode',
+                                style: Theme.of(context).textTheme.titleSmall!
+                                    .copyWith(
+                                      color: isDark
+                                          ? AppTheme.backgroundWhite
+                                          : AppTheme.backgroundDark,
+                                    ),
+                              ),
+                              trailing:
+                                  settingsProvider.themeMode == ThemeMode.dark
+                                  ? Icon(
+                                      Icons.check_circle,
+                                      color: AppTheme.primary,
+                                    )
+                                  : null,
+                              onTap: () =>
+                                  settingsProvider.changeTheme(ThemeMode.dark),
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // Quick Toggle Switch (for convenience)
                       ProfileCardSwitch(
                         icon: Icons.dark_mode_outlined,
                         title: 'Dark Theme',
-                        subtitle: 'Reduce eye strain with a darker palette',
+                        subtitle: settingsProvider.isUsingSystemTheme
+                            ? 'Following device theme'
+                            : 'Manual theme selection',
                         isDark: isDark,
-                        // When system is active, we still compute the switch from current appearance.
-                        // Toggling always sets an explicit choice (dark/light) and persists it.
-                        value: isDark,
-                        onChanged: (value) {
-                          settingsProvider.changeTheme(
-                            value ? ThemeMode.dark : ThemeMode.light,
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton.icon(
-                          onPressed: () => settingsProvider.useSystemTheme(),
-                          icon: const Icon(Icons.smartphone),
-                          label: const Text('Use device theme'),
-                          // Optional: style it to match your theme
-                        ),
+                        value:
+                            isDark, // This shows current appearance (even if system)
+                        onChanged: settingsProvider.isUsingSystemTheme
+                            ? null // Disable when using system theme
+                            : (value) {
+                                settingsProvider.changeTheme(
+                                  value ? ThemeMode.dark : ThemeMode.light,
+                                );
+                              },
                       ),
                     ],
                   ),
@@ -529,7 +634,6 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
       ),
       child: Column(
         children: [
-          // Main ListTile
           ListTile(
             leading: Icon(icon, color: color, size: 24),
             title: Text(
@@ -547,14 +651,9 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
             ),
             onTap: () {
               setState(() {
-                if (_expandedIndex == index) {
-                  // Collapse if already expanded
-                  _expandedIndex = null;
-                } else {
-                  // Expand this item
-                  _expandedIndex = index;
-                }
+                _expandedIndex = _expandedIndex == index ? null : index;
               });
+              onTap();
             },
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 8,
@@ -565,8 +664,6 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
             ),
             minLeadingWidth: 28,
           ),
-
-          // Expandable Content
           if (isExpanded)
             Container(
               margin: const EdgeInsets.only(bottom: 8, left: 8, right: 8),

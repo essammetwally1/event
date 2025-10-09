@@ -16,25 +16,51 @@ class LoveTab extends StatefulWidget {
 
 class _LoveTabState extends State<LoveTab> {
   late EventProvider eventProvider;
+  VoidCallback? _userListener;
 
   @override
   void initState() {
     super.initState();
-
+    // defer until providers are available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      List<String> favouriteIds = Provider.of<UserProvider>(
+      final user = Provider.of<UserProvider>(
         context,
         listen: false,
-      ).currentUser!.favouriteEventsIds;
-      eventProvider.filterFavouriteEvents(favouriteIds);
+      ).currentUser;
+      eventProvider = Provider.of<EventProvider>(context, listen: false);
+      if (user != null) {
+        eventProvider.filterFavouriteEvents(user.favouriteEventsIds);
+      }
+      // listen for any later changes to favourites
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      _userListener = () {
+        final u = userProvider.currentUser;
+        if (u != null) {
+          eventProvider.filterFavouriteEvents(u.favouriteEventsIds);
+        } else {
+          eventProvider.filterFavouriteEvents(const []);
+        }
+      };
+      userProvider.addListener(_userListener!);
     });
+  }
+
+  @override
+  void dispose() {
+    if (_userListener != null) {
+      Provider.of<UserProvider>(
+        context,
+        listen: false,
+      ).removeListener(_userListener!);
+    }
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final bool isDark = Provider.of<SettingsProvider>(context).isDark;
-
     eventProvider = Provider.of<EventProvider>(context);
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -43,21 +69,21 @@ class _LoveTabState extends State<LoveTab> {
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: CustomTextFormField(
                 isDark: isDark,
-
                 hintText: 'Search For Event',
                 iconPathName: 'search',
-
-                onChange: (query) {},
+                onChange: (query) {
+                  // Optional: implement local search within favourites
+                  // eventProvider.searchInFavourite(query);
+                },
               ),
             ),
-            SizedBox(height: 16),
-
+            const SizedBox(height: 16),
             Expanded(
               child: ListView.separated(
                 padding: EdgeInsets.zero,
                 itemBuilder: (_, index) =>
                     EventItem(event: eventProvider.favouriteEvents[index]),
-                separatorBuilder: (_, _) => SizedBox(height: 8),
+                separatorBuilder: (_, __) => const SizedBox(height: 8),
                 itemCount: eventProvider.favouriteEvents.length,
               ),
             ),
