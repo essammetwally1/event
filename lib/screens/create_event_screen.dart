@@ -205,6 +205,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       ),
                     ),
                     CustomTextFormField(
+                      isDark: isDark,
                       hintText: widget.eventModel != null
                           ? widget.eventModel!.title
                           : 'Event Title',
@@ -227,6 +228,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       ),
                     ),
                     CustomTextFormField(
+                      isDark: isDark,
                       controller: descriptionController,
                       maxLines: 4,
                       hintText: widget.eventModel != null

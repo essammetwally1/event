@@ -20,20 +20,30 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
 
-  static const List<Widget> taps = <Widget>[
-    HomeTab(),
-    MapTab(),
-    LoveTab(),
-    ProfileTab(),
+  // Keep pages’ state (including HomeTab’s header selection)
+  final PageStorageBucket _bucket = PageStorageBucket();
+
+  late final List<Widget> _pages = const [
+    HomeTab(key: PageStorageKey('homeTab')),
+    MapTab(key: PageStorageKey('mapTab')),
+    LoveTab(key: PageStorageKey('loveTab')),
+    ProfileTab(key: PageStorageKey('profileTab')),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: taps[selectedIndex],
+      body: PageStorage(
+        bucket: _bucket,
+        child: IndexedStack(
+          // 👈 preserves tabs
+          index: selectedIndex,
+          children: _pages,
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         shape: Provider.of<SettingsProvider>(context).isDark
-            ? CircleBorder(
+            ? const CircleBorder(
                 side: BorderSide(color: AppTheme.backgroundWhite, width: 4),
               )
             : null,
@@ -42,26 +52,22 @@ class _HomeScreenState extends State<HomeScreen> {
             context,
           ).pushReplacementNamed(CreateEventScreen.routeName);
         },
-        child: Icon(Icons.add, size: 36),
+        child: const Icon(Icons.add, size: 36),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         padding: EdgeInsets.zero,
-        shape: CircularNotchedRectangle(),
-
+        shape: const CircularNotchedRectangle(),
         notchMargin: 8,
         clipBehavior: Clip.antiAlias,
-
         child: BottomNavigationBar(
           currentIndex: selectedIndex,
           onTap: (index) {
             if (index != selectedIndex) {
-              setState(() {
-                selectedIndex = index;
-              });
+              setState(() => selectedIndex = index);
             }
           },
-          items: [
+          items: const [
             BottomNavigationBarItem(
               icon: NavbarIcon(iconName: 'home'),
               activeIcon: NavbarIcon(iconName: 'homeActive'),

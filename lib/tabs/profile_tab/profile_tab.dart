@@ -75,7 +75,7 @@ class _ProfileTabState extends State<ProfileTab> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                user!.name,
+                                user.name,
                                 style: textTheme.headlineSmall,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,

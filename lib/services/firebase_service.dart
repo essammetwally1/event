@@ -24,32 +24,6 @@ class FirebaseService {
             toFirestore: (user, _) => user.toJson(),
           );
 
-  static Future<void> createEvent(EventModel event) {
-    final eventsCollection = getEventsCollection();
-    final docs = eventsCollection.doc();
-    event.id = docs.id;
-    return docs.set(event);
-  }
-
-  static Future<List<EventModel>> getEvents() async {
-    final eventsCollection = getEventsCollection();
-    final querySnapshot = await eventsCollection.orderBy('timestamp').get();
-    return querySnapshot.docs.map((event) => event.data()).toList();
-  }
-
-  static Future<bool> deleteEvent(String eventId) async {
-    try {
-      await getEventsCollection().doc(eventId).delete();
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  static Future<void> updateEvent(EventModel event) async {
-    await getEventsCollection().doc(event.id).update(event.toJson());
-  }
-
   static Future<UserModel> register({
     required String name,
     required String password,
@@ -98,6 +72,92 @@ class FirebaseService {
   }
 
   static Future<void> signOut() => FirebaseAuth.instance.signOut();
+
+  static Future<UserModel> updateProfileName({required String name}) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw FirebaseAuthException(
+        code: 'no-current-user',
+        message: 'No authenticated user.',
+      );
+    }
+
+    final users = getUsersCollection();
+    final docRef = users.doc(user.uid);
+
+    // 1) Update Firestore
+    await docRef.update({'name': name});
+
+    // 2) Update FirebaseAuth profile
+    await user.updateDisplayName(name);
+    await user.reload();
+
+    // 3) Return the fresh model
+    final snap = await docRef.get();
+    if (!snap.exists || snap.data() == null) {
+      // fallback (shouldn’t happen if doc exists)
+      return UserModel(
+        id: user.uid,
+        name: name,
+        email: user.email ?? '',
+        imageUrl: user.photoURL,
+        favouriteEventsIds: const [],
+      );
+    }
+    return snap.data()!;
+  }
+
+  // ================= Optional: Change password (with re-auth) =================
+  /// Changes the password after re-authenticating with the old password.
+  /// Call this if you want in-app password change instead of email reset.
+  static Future<void> resetPassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null || user.email == null) {
+      throw FirebaseAuthException(
+        code: 'no-current-user',
+        message: 'No authenticated user.',
+      );
+    }
+
+    // Re-authenticate
+    final cred = EmailAuthProvider.credential(
+      email: user.email!,
+      password: oldPassword,
+    );
+    await user.reauthenticateWithCredential(cred);
+
+    // Update password
+    await user.updatePassword(newPassword);
+  }
+
+  static Future<void> createEvent(EventModel event) {
+    final eventsCollection = getEventsCollection();
+    final docs = eventsCollection.doc();
+    event.id = docs.id;
+    return docs.set(event);
+  }
+
+  static Future<List<EventModel>> getEvents() async {
+    final eventsCollection = getEventsCollection();
+    final querySnapshot = await eventsCollection.orderBy('timestamp').get();
+    return querySnapshot.docs.map((event) => event.data()).toList();
+  }
+
+  static Future<bool> deleteEvent(String eventId) async {
+    try {
+      await getEventsCollection().doc(eventId).delete();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<void> updateEvent(EventModel event) async {
+    await getEventsCollection().doc(event.id).update(event.toJson());
+  }
 
   static Future<void> addEventToFavourite(String eventId) async {
     final userDoc = getUsersCollection().doc(

@@ -101,6 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     }
                     return null;
                   },
+                  isDark: isDark,
                 ),
                 const SizedBox(height: 16),
                 CustomTextFormField(
@@ -117,6 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                     }
                   },
+                  isDark: isDark,
                 ),
 
                 // Add Remember Me checkbox here

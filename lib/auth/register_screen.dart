@@ -30,7 +30,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    isDark = Provider.of<SettingsProvider>(context).isDark;
+    final bool isDark = Provider.of<SettingsProvider>(context).isDark;
 
     return Scaffold(
       appBar: AppBar(
@@ -68,6 +68,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 SizedBox(height: 50),
                 CustomTextFormField(
+                  isDark: isDark,
+
                   hintText: 'Name',
                   iconPathName: 'name',
                   controller: nameController,
@@ -83,6 +85,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 SizedBox(height: 16),
                 CustomTextFormField(
+                  isDark: isDark,
                   hintText: 'Mail',
                   iconPathName: 'mail',
                   controller: emailController,
@@ -99,6 +102,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 SizedBox(height: 16),
                 CustomTextFormField(
+                  isDark: isDark,
+
                   hintText: 'Password',
                   iconPathName: 'password',
                   controller: passwordController,

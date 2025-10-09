@@ -108,66 +108,79 @@ class ImagePickerService {
               title: Text('Take a Photo', style: theme.titleMedium),
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
-            ListTile(
-              leading: Icon(Icons.delete, color: AppTheme.red),
-              title: Text(
-                'Delete Profile Image',
-                style: theme.titleMedium!.copyWith(color: AppTheme.red),
-              ),
-              onTap: () {
-                Navigator.pop(context); // Close the bottom sheet first
-
-                // Show confirmation dialog
-                showDialog(
-                  barrierColor: AppTheme.primary.withValues(alpha: 0.3),
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    backgroundColor: AppTheme.backgroundWhite,
+            Provider.of<UserProvider>(context).currentUser?.imageUrl != null
+                ? ListTile(
+                    leading: Icon(Icons.delete, color: AppTheme.red),
                     title: Text(
                       'Delete Profile Image',
-                      style: theme.titleLarge!.copyWith(color: AppTheme.red),
+                      style: theme.titleMedium!.copyWith(color: AppTheme.red),
                     ),
-                    content: Text(
-                      'Are you sure you want to delete your profile image?',
-                      style: theme.titleMedium!.copyWith(color: AppTheme.black),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(
-                          'Cancel',
-                          style: theme.titleMedium!.copyWith(
-                            color: AppTheme.primary,
+                    onTap: () {
+                      Navigator.pop(context); // Close the bottom sheet first
+
+                      // Show confirmation dialog
+                      showDialog(
+                        barrierColor: AppTheme.primary.withValues(alpha: 0.3),
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          backgroundColor: isDark
+                              ? AppTheme.backgroundDark
+                              : AppTheme.backgroundWhite,
+                          title: Text(
+                            'Delete Profile Image',
+                            style: theme.titleLarge!.copyWith(
+                              color: AppTheme.red,
+                            ),
                           ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          Navigator.pop(context); // Close confirmation dialog
-                          try {
-                            final userProvider = Provider.of<UserProvider>(
-                              context,
-                              listen: false,
-                            );
-                            await userProvider.deleteProfileImage();
-                          } catch (e) {
-                            Utils.showErrorMessage(
-                              'Failed to delete image: ${e.toString()}',
-                            );
-                          }
-                        },
-                        child: Text(
-                          'Delete',
-                          style: theme.titleMedium!.copyWith(
-                            color: AppTheme.red,
+                          content: Text(
+                            'Are you sure you want to delete your profile image?',
+                            style: theme.titleMedium!.copyWith(
+                              color: isDark
+                                  ? AppTheme.backgroundWhite
+                                  : AppTheme.black,
+                            ),
                           ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(
+                                'Cancel',
+                                style: theme.titleMedium!.copyWith(
+                                  color: AppTheme.primary,
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                Navigator.pop(
+                                  context,
+                                ); // Close confirmation dialog
+                                try {
+                                  final userProvider =
+                                      Provider.of<UserProvider>(
+                                        context,
+                                        listen: false,
+                                      );
+                                  await userProvider.deleteProfileImage();
+                                } catch (e) {
+                                  Utils.showErrorMessage(
+                                    'Failed to delete image: ${e.toString()}',
+                                  );
+                                }
+                              },
+                              child: Text(
+                                'Delete',
+                                style: theme.titleMedium!.copyWith(
+                                  color: AppTheme.red,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                      );
+                    },
+                  )
+                : const SizedBox.shrink(),
           ],
         ),
       ),

@@ -12,28 +12,57 @@ class HomeTab extends StatefulWidget {
   State<HomeTab> createState() => _HomeTabState();
 }
 
-class _HomeTabState extends State<HomeTab> {
+class _HomeTabState extends State<HomeTab>
+    with AutomaticKeepAliveClientMixin<HomeTab> {
+  final ScrollController listController = ScrollController();
+
+  @override
+  bool get wantKeepAlive => true;
+
+  void _scrollToTop() {
+    if (!listController.hasClients) return;
+    listController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
+  void dispose() {
+    listController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    EventProvider eventProvider = Provider.of<EventProvider>(context);
+    super.build(context);
+    final eventProvider = Provider.of<EventProvider>(context);
+
     return Scaffold(
       body: Column(
         children: [
-          HomeHeader(),
-          SizedBox(height: 5),
+          HomeHeader(
+            onCategoryTap: (index) {
+              _scrollToTop();
+            },
+          ),
+
+          const SizedBox(height: 5),
+
           eventProvider.filteredEvents.isNotEmpty
               ? Expanded(
                   child: ListView.separated(
+                    controller: listController,
+                    key: const PageStorageKey('homeEventsList'),
                     padding: EdgeInsets.zero,
                     itemBuilder: (_, index) => GestureDetector(
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) {
-                              return EventItemScreen(
-                                eventModel: eventProvider.filteredEvents[index],
-                              );
-                            },
+                            builder: (context) => EventItemScreen(
+                              eventModel: eventProvider.filteredEvents[index],
+                            ),
                           ),
                         );
                       },
@@ -41,11 +70,11 @@ class _HomeTabState extends State<HomeTab> {
                         event: eventProvider.filteredEvents[index],
                       ),
                     ),
-                    separatorBuilder: (_, _) => SizedBox(height: 8),
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
                     itemCount: eventProvider.filteredEvents.length,
                   ),
                 )
-              : Text(''),
+              : const SizedBox.shrink(),
         ],
       ),
     );

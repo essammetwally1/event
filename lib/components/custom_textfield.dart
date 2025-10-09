@@ -11,6 +11,7 @@ class CustomTextFormField extends StatefulWidget {
   final int? maxLines;
   final String? Function(String?)? validator;
   final bool isPassword;
+  final bool isDark;
 
   const CustomTextFormField({
     super.key,
@@ -22,6 +23,7 @@ class CustomTextFormField extends StatefulWidget {
     this.validator,
     this.onPressed,
     this.isPassword = false,
+    required this.isDark,
   });
 
   @override
@@ -70,6 +72,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                 width: 24,
                 height: 24,
                 fit: BoxFit.scaleDown,
+                colorFilter: ColorFilter.mode(AppTheme.gray, BlendMode.srcIn),
               ),
       ),
     );

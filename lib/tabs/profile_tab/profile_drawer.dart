@@ -1,5 +1,9 @@
 import 'package:event/auth/login_screen.dart';
 import 'package:event/components/profile_avatar.dart';
+import 'package:event/components/profile_card.dart';
+import 'package:event/components/profile_card_switch.dart';
+import 'package:event/components/reset_password_sheet.dart';
+import 'package:event/components/update_name_sheet.dart';
 import 'package:event/models/user_model.dart';
 import 'package:event/provider/settings_provider.dart';
 import 'package:event/provider/user_provider.dart';
@@ -99,6 +103,89 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
     } catch (e) {
       Utils.showErrorMessage('Failed to update image: ${e.toString()}');
     }
+  }
+
+  void _openProfilePanel(
+    BuildContext context, {
+    required String title,
+    required Widget child,
+    required bool isDark,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: isDark
+          ? AppTheme.backgroundDark
+          : AppTheme.backgroundWhite,
+      barrierColor: AppTheme.primary.withValues(alpha: 0.1),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          top: false,
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.sizeOf(context).height * .6,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 8),
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: (isDark ? AppTheme.primary : AppTheme.primary),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 8, 4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: isDark
+                                      ? AppTheme.backgroundWhite
+                                      : AppTheme.primary,
+                                ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: Icon(
+                            Icons.close,
+                            color: isDark
+                                ? AppTheme.backgroundWhite
+                                : AppTheme.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                      child: SingleChildScrollView(child: child),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -221,14 +308,57 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
                   icon: Icons.person_outline,
                   title: 'Edit Profile',
                   onTap: () {},
-                  child: Text(
-                    'Essam Teck',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium!.copyWith(color: AppTheme.black),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isNarrow = constraints.maxWidth < 380;
+                      return Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children:
+                            [
+                              ProfileCard(
+                                icon: Icons.edit_outlined,
+                                title: 'Update Name',
+                                subtitle: 'Change your display name',
+                                isDark: isDark,
+                                onTap: () {
+                                  _openProfilePanel(
+                                    context,
+                                    title: 'Update Name',
+                                    child: const UpdateNameSheet(),
+                                    isDark: isDark,
+                                  );
+                                },
+                              ),
+                              ProfileCard(
+                                icon: Icons.lock_reset_outlined,
+                                title: 'Reset Password',
+                                subtitle: 'Change your account password',
+                                isDark: isDark,
+                                onTap: () {
+                                  _openProfilePanel(
+                                    context,
+                                    title: 'Reset Password',
+                                    child: const ResetPasswordSheet(),
+                                    isDark: isDark,
+                                  );
+                                },
+                              ),
+                            ].map((w) {
+                              return SizedBox(
+                                width: isNarrow
+                                    ? double.infinity
+                                    : (constraints.maxWidth - 12) / 2,
+                                child: w,
+                              );
+                            }).toList(),
+                      );
+                    },
                   ),
+
                   isDark: isDark,
                 ),
+
                 _buildExpandableDrawerItem(
                   context,
                   index: 1,
@@ -237,29 +367,17 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
                   onTap: () {},
                   isDark: isDark,
 
-                  child: Row(
-                    children: [
-                      Text(
-                        'Dark Theme',
-                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                          color: isDark
-                              ? AppTheme.backgroundWhite
-                              : AppTheme.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Spacer(),
-                      Switch(
-                        activeTrackColor: AppTheme.primary,
-                        inactiveTrackColor: AppTheme.backgroundWhite,
-                        value: isDark,
-                        onChanged: (value) {
-                          settingsProvider.changeTheme(
-                            value ? ThemeMode.dark : ThemeMode.light,
-                          );
-                        },
-                      ),
-                    ],
+                  child: ProfileCardSwitch(
+                    icon: Icons.dark_mode_outlined,
+                    title: 'Dark Theme',
+                    subtitle: 'Reduce eye strain with a darker palette',
+                    isDark: isDark,
+                    value: isDark,
+                    onChanged: (value) {
+                      settingsProvider.changeTheme(
+                        value ? ThemeMode.dark : ThemeMode.light,
+                      );
+                    },
                   ),
                 ),
                 _buildExpandableDrawerItem(
@@ -268,13 +386,26 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
                   icon: Icons.help_outline,
                   onTap: () {},
                   title: 'Help & Support',
-                  child: Text(
-                    'Essam Teck',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium!.copyWith(color: AppTheme.black),
-                  ),
                   isDark: isDark,
+                  child: Column(
+                    children: [
+                      ProfileCard(
+                        icon: Icons.article_outlined,
+                        title: 'FAQ',
+                        subtitle: 'Common questions and quick answers',
+                        isDark: isDark,
+                        onTap: () {},
+                      ),
+                      const SizedBox(height: 12),
+                      ProfileCard(
+                        icon: Icons.support_agent_outlined,
+                        title: 'Contact Support',
+                        subtitle: 'Get help from our team',
+                        isDark: isDark,
+                        onTap: () {},
+                      ),
+                    ],
+                  ),
                 ),
                 _buildExpandableDrawerItem(
                   context,
@@ -282,31 +413,40 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
                   icon: Icons.info_outline,
                   onTap: () {},
                   title: 'About',
+                  isDark: isDark,
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Developer: EssamTech',
-
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: isDark
-                              ? AppTheme.backgroundWhite
-                              : AppTheme.black,
-                        ),
+                      ProfileCard(
+                        icon: Icons.person_outline,
+                        title: 'Developer',
+                        subtitle: 'EssamTech',
+                        isDark: isDark,
+                        onTap: () {
+                          // Optional: show more bio
+                        },
                       ),
-                      Text(
-                        'mail: essammetwally11@gmail.com',
-
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: isDark
-                              ? AppTheme.backgroundWhite
-                              : AppTheme.black,
-                        ),
+                      const SizedBox(height: 12),
+                      ProfileCard(
+                        icon: Icons.mail_outline,
+                        title: 'Email',
+                        subtitle: 'essammetwally11@gmail.com',
+                        isDark: isDark,
+                        onTap: () {
+                          // TODO: launch mailto:essammetwally11@gmail.com
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      ProfileCard(
+                        icon: Icons.verified_outlined,
+                        title: 'Version',
+                        subtitle: '1.0.0',
+                        isDark: isDark,
+                        onTap: () {
+                          // Optional: show changelog
+                        },
                       ),
                     ],
                   ),
-                  isDark: isDark,
                 ),
                 const Divider(),
                 ListTile(

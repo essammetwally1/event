@@ -51,7 +51,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
 
   @override
   Widget build(BuildContext context) {
-    isDark = Provider.of<SettingsProvider>(context).isDark;
+    final bool isDark = Provider.of<SettingsProvider>(context).isDark;
 
     TextTheme textTheme = Theme.of(context).textTheme;
     return Scaffold(
@@ -129,6 +129,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
                     ),
                     CustomTextFormField(
                       hintText: widget.eventModel.title,
+                      isDark: isDark,
 
                       iconPathName: 'titleEvent',
                       controller: titleController,
@@ -147,6 +148,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
                       ),
                     ),
                     CustomTextFormField(
+                      isDark: isDark,
                       controller: descriptionController,
                       maxLines: 4,
                       hintText: widget.eventModel.description,

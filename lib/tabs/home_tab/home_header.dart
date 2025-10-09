@@ -8,26 +8,43 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class HomeHeader extends StatefulWidget {
-  const HomeHeader({super.key});
+  final ValueChanged<int>? onCategoryTap;
+  const HomeHeader({super.key, required this.onCategoryTap});
 
   @override
   State<HomeHeader> createState() => _HomeHeaderState();
 }
 
 class _HomeHeaderState extends State<HomeHeader> {
+  static const String _psId = 'homeHeaderSelectedIndex';
+
   int currentIndex = 0;
   late bool isDark;
+
+  @override
+  void initState() {
+    super.initState();
+    currentIndex = 0;
+  }
+
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
+    final textTheme = Theme.of(context).textTheme;
     isDark = Provider.of<SettingsProvider>(context).isDark;
+
+    // Try reading saved index (only first time build runs)
+    final saved =
+        PageStorage.of(context).readState(context, identifier: _psId) as int? ??
+        currentIndex;
+    if (currentIndex != saved) currentIndex = saved;
+
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
         color: isDark
             ? AppTheme.primary.withValues(alpha: .5)
             : AppTheme.primary,
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(24),
         ),
@@ -42,31 +59,52 @@ class _HomeHeaderState extends State<HomeHeader> {
               Provider.of<UserProvider>(context).currentUser!.name,
               style: textTheme.headlineSmall,
             ),
+            const SizedBox(height: 8),
 
-            SizedBox(height: 8),
-
+            // Keep your DefaultTabController; just set initialIndex.
             DefaultTabController(
               length: CategoryModel.categoryList.length + 1,
-
+              initialIndex: currentIndex.clamp(
+                0,
+                CategoryModel.categoryList.length,
+              ),
               child: TabBar(
                 tabAlignment: TabAlignment.start,
                 dividerColor: Colors.transparent,
                 indicatorColor: Colors.transparent,
                 isScrollable: true,
-                labelPadding: EdgeInsetsDirectional.only(end: 10),
+                labelPadding: const EdgeInsetsDirectional.only(end: 10),
+
                 onTap: (index) {
-                  if (currentIndex == index) return;
+                  if (currentIndex == index) {
+                    // still notify so list can jump to top on same-tab taps if you want
+                    widget.onCategoryTap?.call(index);
+                    return;
+                  }
 
                   currentIndex = index;
-                  CategoryModel? categoryModel = currentIndex == 0
+
+                  // Filter your events based on selected category
+                  final CategoryModel? categoryModel = currentIndex == 0
                       ? null
                       : CategoryModel.categoryList[currentIndex - 1];
+
                   Provider.of<EventProvider>(
                     context,
                     listen: false,
                   ).filterEvents(categoryModel);
+
+                  // Persist the chosen tab
+                  PageStorage.of(
+                    context,
+                  ).writeState(context, currentIndex, identifier: _psId);
+
+                  // Notify parent (HomeTab) to scroll the list up
+                  widget.onCategoryTap?.call(index);
+
                   setState(() {});
                 },
+
                 tabs: [
                   TabItem(
                     label: 'All',
