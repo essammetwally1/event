@@ -64,23 +64,24 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
     if (!mounted) return;
 
+    if (res.isSuccess) {
+      _pickedLatLng = res.latLng!;
+
+      _pickedAddress = await LocationService.getAddressFromLatLng(
+        _pickedLatLng!,
+      );
+    } else {
+      _pickedAddress = res.message;
+
+      // Optional: silent fallback coordinate (e.g., Cairo) on hard failures
+      if (res.state == LocationState.error ||
+          res.state == LocationState.servicesDisabled) {
+        _pickedLatLng = const LatLng(30.0444, 31.2357);
+      }
+    }
     setState(() {
       _isGettingLocation = false;
       _locationState = res.state;
-
-      if (res.isSuccess) {
-        _pickedLatLng = res.latLng!;
-        _pickedAddress =
-            '${res.latLng!.latitude.toStringAsFixed(4)}, ${res.latLng!.longitude.toStringAsFixed(4)}';
-      } else {
-        _pickedAddress = res.message;
-
-        // Optional: silent fallback coordinate (e.g., Cairo) on hard failures
-        if (res.state == LocationState.error ||
-            res.state == LocationState.servicesDisabled) {
-          _pickedLatLng = const LatLng(30.0444, 31.2357);
-        }
-      }
     });
   }
 
@@ -325,10 +326,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                               );
 
                               if (result != null) {
+                                if (!mounted) return;
                                 setState(() {
                                   _pickedLatLng = result;
-                                  _pickedAddress =
-                                      '${result.latitude.toStringAsFixed(4)}, ${result.longitude.toStringAsFixed(4)}';
                                   _locationState =
                                       LocationState.success; // now good
                                 });

@@ -1,6 +1,6 @@
-// lib/services/location_service.dart
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geocoding/geocoding.dart'; // ✅ new import for reverse geocoding
 
 enum LocationState {
   success,
@@ -70,6 +70,57 @@ class LocationService {
         state: LocationState.error,
         message: 'Error getting location: $e',
       );
+    }
+  }
+
+  // ✅ New: Get human-readable address from LatLng
+  static Future<String> getAddressFromLatLng(LatLng latLng) async {
+    try {
+      final List<Placemark> placemarks = await placemarkFromCoordinates(
+        latLng.latitude,
+        latLng.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        final Placemark p = placemarks.first;
+
+        // Prefer short form: "Street, City" or "City, Country"
+        final String? street = (p.street != null && p.street!.isNotEmpty)
+            ? p.street
+            : null;
+        final String? city = (p.locality != null && p.locality!.isNotEmpty)
+            ? p.locality
+            : null;
+        final String? area =
+            (p.administrativeArea != null && p.administrativeArea!.isNotEmpty)
+            ? p.administrativeArea
+            : null;
+        final String? country = (p.country != null && p.country!.isNotEmpty)
+            ? p.country
+            : null;
+
+        // Compose small readable version — prioritizing city-level info
+        String smallAddress = '';
+        if (street != null && city != null) {
+          smallAddress = '$street, $city';
+        } else if (city != null && area != null) {
+          smallAddress = '$city, $area';
+        } else if (area != null && country != null) {
+          smallAddress = '$area, $country';
+        } else if (city != null && country != null) {
+          smallAddress = '$city, $country';
+        } else {
+          smallAddress =
+              '${latLng.latitude.toStringAsFixed(4)}, '
+              '${latLng.longitude.toStringAsFixed(4)}';
+        }
+
+        return smallAddress;
+      } else {
+        return '${latLng.latitude.toStringAsFixed(4)}, ${latLng.longitude.toStringAsFixed(4)}';
+      }
+    } catch (e) {
+      return 'Unknown (${latLng.latitude.toStringAsFixed(4)}, ${latLng.longitude.toStringAsFixed(4)})';
     }
   }
 }
