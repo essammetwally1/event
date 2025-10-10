@@ -64,7 +64,11 @@ class ProfileCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: Theme.of(context).textTheme.titleSmall!
                               .copyWith(
-                                color: isDark ? Colors.white70 : Colors.black54,
+                                color: isDark
+                                    ? AppTheme.backgroundWhite.withValues(
+                                        alpha: .7,
+                                      )
+                                    : AppTheme.black,
                               ),
                         )
                       : const SizedBox.shrink(),

@@ -65,7 +65,7 @@ class _UpdateNameSheetState extends State<UpdateNameSheet> {
     return Form(
       key: globalKey,
       child: Column(
-        mainAxisSize: MainAxisSize.min, // 👈 keeps sheet tight
+        mainAxisSize: MainAxisSize.min,
         children: [
           CustomTextFormField(
             controller: nameController,
@@ -73,20 +73,24 @@ class _UpdateNameSheetState extends State<UpdateNameSheet> {
             iconPathName: 'profile',
             validator: (value) {
               if (value == null || value.trim().isEmpty) return 'Name required';
-              if (value.trim().length < 3)
+              if (value.trim().length < 3) {
                 return 'Name must be at least 3 chars';
+              }
               return null;
             },
             isDark: isDark,
           ),
           const SizedBox(height: 12),
-          CustomElevatedButton(
-            color: isDark
-                ? AppTheme.primary.withValues(alpha: .5)
-                : AppTheme.primary,
-            textElevatedButton: 'Save',
-            isLoading: isLoading,
-            onPressed: _save,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: CustomElevatedButton(
+              color: isDark
+                  ? AppTheme.primary.withValues(alpha: .5)
+                  : AppTheme.primary,
+              textElevatedButton: 'Save',
+              isLoading: isLoading,
+              onPressed: _save,
+            ),
           ),
         ],
       ),

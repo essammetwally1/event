@@ -61,8 +61,11 @@ class ProfileCardSwitch extends StatelessWidget {
                   subtitle,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                    color: isDark ? Colors.white70 : Colors.black54,
+                  style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                    fontSize: 11,
+                    color: isDark
+                        ? AppTheme.backgroundWhite.withValues(alpha: .7)
+                        : AppTheme.black,
                   ),
                 ),
               ],

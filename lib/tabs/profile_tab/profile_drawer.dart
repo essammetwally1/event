@@ -112,6 +112,11 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
     required bool isDark,
   }) {
     showModalBottomSheet(
+      constraints: BoxConstraints(
+        maxWidth: 520,
+        minWidth: 300,
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
+      ),
       context: context,
       isScrollControlled: true,
       backgroundColor: isDark
@@ -128,59 +133,54 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.sizeOf(context).height * .6,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const SizedBox(height: 8),
-                  Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: (isDark ? AppTheme.primary : AppTheme.primary),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 8),
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: (isDark ? AppTheme.primary : AppTheme.primary),
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 8, 4),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            title,
-                            style: Theme.of(context).textTheme.titleLarge
-                                ?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  color: isDark
-                                      ? AppTheme.backgroundWhite
-                                      : AppTheme.primary,
-                                ),
-                          ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 8, 4),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: isDark
+                                    ? AppTheme.backgroundWhite
+                                    : AppTheme.primary,
+                              ),
                         ),
-                        IconButton(
-                          onPressed: () => Navigator.pop(context),
-                          icon: Icon(
-                            Icons.close,
-                            color: isDark
-                                ? AppTheme.backgroundWhite
-                                : AppTheme.black,
-                          ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(
+                          Icons.close,
+                          color: isDark
+                              ? AppTheme.backgroundWhite
+                              : AppTheme.black,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  const Divider(height: 1),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                      child: SingleChildScrollView(child: child),
-                    ),
+                ),
+                const Divider(height: 1),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                    child: SingleChildScrollView(child: child),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
@@ -254,16 +254,36 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
                                 radius: avatarR,
                                 imageUrl: widget.userModel.imageUrl,
                               ),
-                              Positioned(
-                                bottom: 0,
-                                right: 5,
-                                child: widget.userModel.imageUrl != null
-                                    ? Icon(
-                                        Icons.add_a_photo_rounded,
-                                        color: AppTheme.backgroundWhite,
-                                      )
-                                    : SizedBox(),
-                              ),
+                              widget.userModel.imageUrl != null ||
+                                      widget.userModel.imageUrl!.isEmpty
+                                  ? Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(4),
+                                        decoration: BoxDecoration(
+                                          color: isDark
+                                              ? AppTheme.backgroundDark
+                                              : AppTheme.backgroundWhite,
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(
+                                                alpha: 0.2,
+                                              ),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Icon(
+                                          Icons.add_a_photo,
+                                          size: avatarR * 0.4,
+                                          color: AppTheme.primary,
+                                        ),
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
                             ],
                           ),
                         ),
@@ -477,10 +497,10 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              'Event@EssamTeck',
+              '@EssamTeck',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: Colors.grey,
-                fontSize: 13,
+                fontSize: 8,
                 fontWeight: FontWeight.bold,
               ),
             ),

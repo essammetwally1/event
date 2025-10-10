@@ -18,7 +18,7 @@ class ProfileAvatar extends StatelessWidget {
 
     return CircleAvatar(
       radius: radius,
-      backgroundColor: AppTheme.backgroundWhite,
+
       child: ClipOval(
         child: SizedBox(
           width: inner * 2,

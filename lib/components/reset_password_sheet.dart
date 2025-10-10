@@ -117,13 +117,16 @@ class _ResetPasswordSheetState extends State<ResetPasswordSheet> {
                 ),
 
                 const SizedBox(height: 16),
-                CustomElevatedButton(
-                  color: isDark
-                      ? AppTheme.primary.withValues(alpha: .5)
-                      : AppTheme.primary,
-                  textElevatedButton: 'Reset Password',
-                  onPressed: resetPassword,
-                  isLoading: isLoading,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: CustomElevatedButton(
+                    color: isDark
+                        ? AppTheme.primary.withValues(alpha: .5)
+                        : AppTheme.primary,
+                    textElevatedButton: 'Reset Password',
+                    onPressed: resetPassword,
+                    isLoading: isLoading,
+                  ),
                 ),
               ],
             ),
