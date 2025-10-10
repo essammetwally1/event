@@ -14,9 +14,13 @@ import 'package:event/shared/utilis.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:geolocator/geolocator.dart';
+// REMOVE direct geolocator import from screen; logic is in the service now
+// import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+// NEW: import the service
+import 'package:event/services/location_service.dart';
 
 class CreateEventScreen extends StatefulWidget {
   static const String routeName = '/createevent';
@@ -39,7 +43,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   String? _pickedAddress;
   bool _isGettingLocation = true;
 
-  // late bool isDark;
+  // NEW: track permission/services state
+  LocationState? _locationState;
 
   @override
   void initState() {
@@ -48,86 +53,52 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         ? currentIndex = int.parse(widget.eventModel!.categoryModel.id) - 1
         : 0;
 
-    // Initialize with device location
     _getDeviceLatLng();
   }
 
+  // REFACTORED: use the service only; screen decides UI
   Future<void> _getDeviceLatLng() async {
-    try {
-      setState(() {
-        _isGettingLocation = true;
-      });
+    setState(() => _isGettingLocation = true);
 
-      // Check if location service is enabled
-      final bool enabled = await Geolocator.isLocationServiceEnabled();
-      if (!enabled) {
-        if (mounted) {
-          setState(() {
-            _isGettingLocation = false;
-            _pickedAddress = 'Location services disabled';
-          });
-        }
-        return;
-      }
+    final LocationResult res = await LocationService.fetchDeviceLocation();
 
-      // Check location permission
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          if (mounted) {
-            setState(() {
-              _isGettingLocation = false;
-              _pickedAddress = 'Location permission denied';
-            });
-          }
-          return;
-        }
-      }
+    if (!mounted) return;
 
-      if (permission == LocationPermission.deniedForever) {
-        if (mounted) {
-          setState(() {
-            _isGettingLocation = false;
-            _pickedAddress = 'Location permission permanently denied';
-          });
-        }
-        return;
-      }
+    setState(() {
+      _isGettingLocation = false;
+      _locationState = res.state;
 
-      // Get current position
-      final Position position = await Geolocator.getCurrentPosition(
-        locationSettings: LocationSettings(accuracy: LocationAccuracy.best),
-      );
+      if (res.isSuccess) {
+        _pickedLatLng = res.latLng!;
+        _pickedAddress =
+            '${res.latLng!.latitude.toStringAsFixed(4)}, ${res.latLng!.longitude.toStringAsFixed(4)}';
+      } else {
+        _pickedAddress = res.message;
 
-      if (mounted) {
-        setState(() {
-          _pickedLatLng = LatLng(position.latitude, position.longitude);
-          _pickedAddress =
-              '${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}';
-          _isGettingLocation = false;
-        });
-      }
-    } catch (e) {
-      print("Error getting location: $e");
-      if (mounted) {
-        setState(() {
-          _isGettingLocation = false;
-          _pickedAddress = 'Error getting location';
-          // Set default location as fallback
+        // Optional: silent fallback coordinate (e.g., Cairo) on hard failures
+        if (res.state == LocationState.error ||
+            res.state == LocationState.servicesDisabled) {
           _pickedLatLng = const LatLng(30.0444, 31.2357);
-        });
+        }
       }
-    }
+    });
   }
+
+  bool get _canOpenMap => _locationState == LocationState.success;
 
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final bool isDark = Provider.of<SettingsProvider>(context).isDark;
+
+    // Decide dynamic color: primary if success, red otherwise
+    final Color locColor = _locationState == LocationState.success
+        ? AppTheme.primary
+        : AppTheme.red;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create Event'),
+        title: const Text('Create Event'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppTheme.primary),
           onPressed: () {
@@ -151,21 +122,18 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             DefaultTabController(
               length: CategoryModel.categoryList.length,
-
               child: TabBar(
                 tabAlignment: TabAlignment.start,
                 dividerColor: Colors.transparent,
                 indicatorColor: Colors.transparent,
                 isScrollable: true,
-                labelPadding: EdgeInsets.only(right: 10),
+                labelPadding: const EdgeInsets.only(right: 10),
                 onTap: (index) {
                   if (currentIndex == index) return;
-                  setState(() {
-                    currentIndex = index;
-                  });
+                  setState(() => currentIndex = index);
                 },
                 tabs: CategoryModel.categoryList
                     .map(
@@ -188,7 +156,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     .toList(),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.only(right: 16),
               child: Form(
@@ -212,13 +180,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       iconPathName: 'titleEvent',
                       controller: titleController,
                       validator: (value) {
-                        if (value!.length < 10) {
+                        if ((value ?? '').trim().length < 10) {
                           return 'Title should more than 10 letters';
                         }
                         return null;
                       },
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
                       'Event Description',
                       style: textTheme.titleMedium!.copyWith(
@@ -235,81 +203,158 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           ? widget.eventModel!.description
                           : 'Description',
                     ),
+                    // ===== Date Picker =====
                     CustomCreateEventRow(
                       textTheme: textTheme,
                       label: 'Date',
                       iconName: 'date',
-                      date: selectedDate ?? selectedDate,
+                      date: selectedDate,
                       onPressed: () async {
+                        final bool isDark = Provider.of<SettingsProvider>(
+                          context,
+                          listen: false,
+                        ).isDark;
+
                         selectedDate = await showDatePicker(
                           context: context,
                           firstDate: DateTime.now(),
-                          lastDate: DateTime.now().add(Duration(days: 365)),
+                          lastDate: DateTime.now().add(
+                            const Duration(days: 365),
+                          ),
+                          initialDate: selectedDate ?? DateTime.now(),
                           initialEntryMode: DatePickerEntryMode.calendarOnly,
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: ColorScheme.light(
+                                  primary: AppTheme
+                                      .primary, // header and selected day
+                                  onPrimary: Colors.white, // text on primary
+                                  surface: isDark
+                                      ? AppTheme.backgroundDark
+                                      : AppTheme.backgroundWhite,
+                                  onSurface: isDark
+                                      ? AppTheme.backgroundWhite
+                                      : AppTheme.black,
+                                ),
+                                dialogTheme: DialogThemeData(
+                                  backgroundColor: isDark
+                                      ? AppTheme.backgroundDark
+                                      : AppTheme.backgroundWhite,
+                                ),
+                              ),
+                              child: child!,
+                            );
+                          },
                         );
                         setState(() {});
                       },
                     ),
+
+                    // ===== Time Picker =====
                     CustomCreateEventRow(
                       textTheme: textTheme,
                       label: 'Time',
                       iconName: 'time',
-
-                      time: selectedTime ?? selectedTime,
+                      time: selectedTime,
                       onPressed: () async {
+                        final bool isDark = Provider.of<SettingsProvider>(
+                          context,
+                          listen: false,
+                        ).isDark;
+
                         selectedTime = await showTimePicker(
                           context: context,
-                          initialTime: TimeOfDay.now(),
+                          initialTime: selectedTime ?? TimeOfDay.now(),
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: ColorScheme.light(
+                                  primary: AppTheme
+                                      .primary, // clock hand & OK button
+                                  onPrimary: Colors.white, // text on primary
+                                  surface: isDark
+                                      ? AppTheme.backgroundDark
+                                      : AppTheme.backgroundWhite,
+                                  onSurface: isDark
+                                      ? AppTheme.backgroundWhite
+                                      : AppTheme.black,
+                                ),
+                                timePickerTheme: TimePickerThemeData(
+                                  dialBackgroundColor: isDark
+                                      ? AppTheme.backgroundDark
+                                      : AppTheme.backgroundWhite,
+                                  dialHandColor: AppTheme.primary,
+                                  hourMinuteTextColor: isDark
+                                      ? AppTheme.backgroundWhite
+                                      : AppTheme.black,
+                                  entryModeIconColor: AppTheme.primary,
+                                ),
+                                dialogTheme: DialogThemeData(
+                                  backgroundColor: isDark
+                                      ? AppTheme.backgroundDark
+                                      : AppTheme.backgroundWhite,
+                                ),
+                              ),
+                              child: child!,
+                            );
+                          },
                         );
                         setState(() {});
                       },
                     ),
 
-                    // Location Picker Section
+                    // ===== Location Picker Section (color + tap behavior) =====
                     InkWell(
-                      onTap: () async {
-                        // Use the current picked location or device location as initial
-                        final LatLng initial =
-                            _pickedLatLng ?? const LatLng(30.0444, 31.2357);
+                      // Disable tap when location not enabled/allowed
+                      onTap: !_canOpenMap
+                          ? null
+                          : () async {
+                              final LatLng initial =
+                                  _pickedLatLng ??
+                                  const LatLng(30.0444, 31.2357);
 
-                        final result = await Navigator.push<LatLng>(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => MapPickerScreen(
-                              initial: initial,
-                              isSelected: false,
-                            ),
-                          ),
-                        );
+                              final result = await Navigator.push<LatLng>(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => MapPickerScreen(
+                                    initial: initial,
+                                    isSelected: false,
+                                  ),
+                                ),
+                              );
 
-                        if (result != null) {
-                          setState(() {
-                            _pickedLatLng = result;
-                            _pickedAddress =
-                                '${result.latitude.toStringAsFixed(4)}, ${result.longitude.toStringAsFixed(4)}';
-                          });
-                        }
-                      },
+                              if (result != null) {
+                                setState(() {
+                                  _pickedLatLng = result;
+                                  _pickedAddress =
+                                      '${result.latitude.toStringAsFixed(4)}, ${result.longitude.toStringAsFixed(4)}';
+                                  _locationState =
+                                      LocationState.success; // now good
+                                });
+                              }
+                            },
                       child: Container(
-                        padding: EdgeInsets.all(8),
-                        margin: EdgeInsets.only(top: 5, bottom: 16),
+                        padding: const EdgeInsets.all(8),
+                        margin: const EdgeInsets.only(top: 5, bottom: 16),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: AppTheme.primary, width: 2),
+                          border: Border.all(color: locColor, width: 2),
                         ),
                         child: Row(
                           children: [
                             Container(
-                              padding: EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
-                                color: AppTheme.primary,
+                                color:
+                                    locColor, // primary on success, red otherwise
                               ),
                               child: SvgPicture.asset(
                                 'assets/icons/pickLocation.svg',
                               ),
                             ),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Expanded(
                               child: _isGettingLocation
                                   ? Row(
@@ -319,10 +364,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                                           height: 16,
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2,
-                                            color: AppTheme.primary,
+                                            color: locColor, // reflect state
                                           ),
                                         ),
-                                        SizedBox(width: 8),
+                                        const SizedBox(width: 8),
                                         Text(
                                           'Getting your location...',
                                           style: textTheme.titleMedium,
@@ -334,14 +379,20 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Tap to select other location',
+                                          _canOpenMap
+                                              ? 'Tap to select other location'
+                                              : 'Location not available',
                                           style: textTheme.titleMedium,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          _pickedAddress!,
+                                          (_pickedAddress ?? '').isEmpty
+                                              ? (_canOpenMap
+                                                    ? 'Location ready'
+                                                    : 'Enable location to continue')
+                                              : _pickedAddress!,
                                           style: textTheme.titleSmall!.copyWith(
-                                            color: AppTheme.primary,
+                                            color: locColor, // primary or red
                                             fontWeight: FontWeight.bold,
                                           ),
                                           overflow: TextOverflow.ellipsis,
@@ -349,18 +400,15 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                                       ],
                                     ),
                             ),
-                            Icon(
-                              Icons.arrow_forward_ios,
-                              color: AppTheme.primary,
-                            ),
+                            Icon(Icons.arrow_forward_ios, color: locColor),
                           ],
                         ),
                       ),
                     ),
 
+                    // ===== End Location Picker Section =====
                     CustomElevatedButton(
                       isLoading: isLoading,
-
                       textElevatedButton: 'Add Event',
                       onPressed: () {
                         addEvent(isDark: isDark);
@@ -377,6 +425,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   void addEvent({required bool isDark}) {
+    if (_pickedLatLng == null) return;
     if (globalKey.currentState!.validate()) {
       if (selectedDate == null || selectedTime == null) {
         showDialog(
@@ -399,36 +448,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             ),
             actions: [
               TextButton(
-                style: TextButton.styleFrom(),
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text('OK'),
-              ),
-            ],
-          ),
-        );
-        return;
-      }
-
-      if (_pickedLatLng == null) {
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            backgroundColor: AppTheme.backgroundWhite,
-            title: Text(
-              'Select Location',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge!.copyWith(color: AppTheme.primary),
-            ),
-            content: Text(
-              'Please select a location for your event.',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            actions: [
-              TextButton(
-                style: TextButton.styleFrom(),
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           ),
@@ -437,12 +458,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       }
 
       if (isLoading == false) {
-        setState(() {
-          isLoading = true;
-        });
+        setState(() => isLoading = true);
       }
 
-      DateTime dateTime = DateTime(
+      final DateTime dateTime = DateTime(
         selectedDate!.year,
         selectedDate!.month,
         selectedDate!.day,
@@ -450,14 +469,14 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         selectedTime!.minute,
       );
 
-      EventModel eventModel = EventModel(
+      final EventModel eventModel = EventModel(
         userId: FirebaseAuth.instance.currentUser!.uid,
         title: titleController!.text,
         description: descriptionController!.text,
         categoryModel: CategoryModel.categoryList[currentIndex],
         dateTime: dateTime,
-        location: _pickedLatLng!, // Add location
-        address: _pickedAddress, // Add address
+        location: _pickedLatLng!,
+        address: _pickedAddress,
       );
 
       FirebaseService.createEvent(eventModel)
@@ -467,13 +486,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             Provider.of<EventProvider>(context, listen: false).getEvents();
           })
           .catchError((error) {
-            setState(() {
-              isLoading = false;
-            });
+            setState(() => isLoading = false);
             String? message;
-            if (error is FirebaseException) {
-              message = error.message;
-            }
+            if (error is FirebaseException) message = error.message;
             Utils.showErrorMessage(message ?? 'Failed to create event');
           });
     }
